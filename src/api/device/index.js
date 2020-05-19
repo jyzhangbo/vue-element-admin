@@ -1,13 +1,12 @@
 import request from '@/utils/request'
 
-export function getUserList(data) {
+export function getDeviceList(data) {
   return request({
-    url: '/user/list',
+    url: '/device/list',
     method: 'post',
     data: {
       companyName: data.companyName,
-      phone: data.phone,
-      loginName: data.loginName
+      deviceNum: data.deviceNum
     }
   })
 }

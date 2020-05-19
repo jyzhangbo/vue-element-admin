@@ -82,46 +82,32 @@ export const constantRoutes = [
         meta: { title: '首页', icon: 'dashboard', noCache: true }
       }
     ]
+  },
+  {
+    path: '/alarm',
+    component: Layout,
+    redirect: '/alarm/alarm-rule',
+    name: '告警管理',
+    alwaysShow: true,
+    meta: {
+      title: '告警管理',
+      icon: 'example'
+    },
+    children: [
+      {
+        path: 'alarm-rule',
+        component: () => import('@/views/alarm/alarm-rule'),
+        name: '告警规则',
+        meta: { title: '告警规则', icon: 'edit', noCache: true }
+      },
+      {
+        path: 'alarm-list',
+        component: () => import('@/views/alarm/alarm-list'),
+        name: '告警列表',
+        meta: { title: '告警列表', icon: 'edit', noCache: true }
+      }
+    ]
   }
-  // {
-  //   path: '/documentation',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/documentation/index'),
-  //       name: 'Documentation',
-  //       meta: { title: 'Documentation', icon: 'documentation', affix: true }
-  //     }
-  //   ]
-  // },
-  // {
-  //   path: '/guide',
-  //   component: Layout,
-  //   redirect: '/guide/index',
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/guide/index'),
-  //       name: 'Guide',
-  //       meta: { title: 'Guide', icon: 'guide', noCache: true }
-  //     }
-  //   ]
-  // },
-  // {
-  //   path: '/profile',
-  //   component: Layout,
-  //   redirect: '/profile/index',
-  //   hidden: true,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/profile/index'),
-  //       name: 'Profile',
-  //       meta: { title: 'Profile', icon: 'user', noCache: true }
-  //     }
-  //   ]
-  // }
 ]
 
 /**

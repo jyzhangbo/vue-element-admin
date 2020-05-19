@@ -4,38 +4,33 @@
       <el-form ref="listQuery" :model="listQuery" label-width="130px" style="padding-top:10px;">
         <el-row>
           <el-col :span="8">
-            <el-form-item label="厂家名称" prop="companyName">
-              <el-input v-model="listQuery.companyName" />
+            <el-form-item label="告警对象" prop="alarmObject">
+              <el-input v-model="listQuery.alarmObject" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="设备编号" prop="devicNum">
-              <el-input v-model="listQuery.devicNum" />
+            <el-form-item label="告警状态" prop="state">
+              <el-input v-model="listQuery.state" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row type="flex" justify="end">
           <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="btnQuery()">查询</el-button>
           <el-button type="info" icon="el-icon-magic-stick" @click="resetQuery('listQuery')">重置</el-button>
-          <el-button style="background-color: #42b983;" type="success" icon="el-icon-edit" @click="btnCreate()">新增</el-button>
-          <el-button style="background-color: #42b983;" type="success" icon="el-icon-edit" @click="btnCreate()">导入</el-button>
         </el-row>
       </el-form>
     </div>
 
     <el-table :data="tableData" border stripe style="width: 100%">
       <el-table-column type="index" label="序号" width="50" />
-      <el-table-column prop="deviceNum" label="设备编号" width="180" />
-      <el-table-column prop="companyName" label="厂家名称" width="180" />
-      <el-table-column prop="phone" label="联系电话" width="180" />
-      <el-table-column prop="loginName" label="登陆名" width="180" />
+      <el-table-column prop="alarmObject" label="告警对象" width="180" />
+      <el-table-column prop="alarmRule" label="告警规则" width="180" />
+      <el-table-column prop="createTime" label="创建时间" width="180" />
+      <el-table-column prop="state" label="状态" width="180" />
       <el-table-column label="操作">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="btnEdit(row)">
             修改
-          </el-button>
-          <el-button type="primary" size="mini" @click="btnDel(row)">
-            删除
           </el-button>
         </template>
       </el-table-column>
@@ -47,17 +42,14 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="设备编号" prop="deviceNum">
-          <el-input v-model="temp.deviceNum" />
+        <el-form-item label="告警对象" prop="alarmObject">
+          <el-input v-model="temp.alarmObject" />
         </el-form-item>
-        <el-form-item label="厂家名称" prop="companyName">
-          <el-input v-model="temp.companyName" />
+        <el-form-item label="告警规则" prop="alarmRule">
+          <el-input v-model="temp.alarmRule" />
         </el-form-item>
-        <el-form-item label="联系电话" prop="phone">
-          <el-input v-model="temp.phone" />
-        </el-form-item>
-        <el-form-item label="登陆名" prop="loginName">
-          <el-input v-model="temp.loginName" />
+        <el-form-item label="状态" prop="state">
+          <el-input v-model="temp.state" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -73,7 +65,7 @@
 </template>
 
 <script>
-import { getDeviceList } from '@/api/device/index'
+import { getAlarmRuleList } from '@/api/alarm/index'
 export default {
   data() {
     return {
@@ -84,14 +76,13 @@ export default {
         create: 'Create'
       },
       temp: {
-        companyName: undefined,
-        phone: undefined,
-        loginName: undefined,
-        deviceNum: undefined
+        alarmObject: undefined,
+        alarmRule: undefined,
+        state: undefined
       },
       listQuery: {
-        companyName: undefined,
-        deviceNum: undefined
+        alarmObject: undefined,
+        state: undefined
       },
       tablePage: { total: 0, pageSize: 10, pageNumber: 1 },
       tableData: []
@@ -105,7 +96,7 @@ export default {
       this.$refs[formName].resetFields()
     },
     btnQuery() {
-      getDeviceList(this.listQuery).then(resp => {
+      getAlarmRuleList(this.listQuery).then(resp => {
         this.tableData = resp.data.infos
         this.tablePage.total = resp.data.total
       })
@@ -122,10 +113,9 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        companyName: undefined,
-        phone: undefined,
-        loginName: undefined,
-        deviceNum: undefined
+        alarmObject: undefined,
+        alarmRule: undefined,
+        state: undefined
       }
     }
   }
