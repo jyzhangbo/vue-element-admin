@@ -84,6 +84,32 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/task',
+    component: Layout,
+    redirect: '/task/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/task/index'),
+        name: '任务管理',
+        meta: { title: '任务管理', icon: 'user', noCache: true }
+      }
+    ]
+  },
+  {
+    path: '/simulation',
+    component: Layout,
+    redirect: '/simulation/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/simulation/index'),
+        name: '数据模拟',
+        meta: { title: '数据模拟', icon: 'user', noCache: true }
+      }
+    ]
+  },
+  {
     path: '/alarm',
     component: Layout,
     redirect: '/alarm/alarm-rule',

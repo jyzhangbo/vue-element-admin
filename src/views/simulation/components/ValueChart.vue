@@ -4,7 +4,7 @@
 
 <script>
 import echarts from 'echarts'
-import resize from './mixins/resize'
+import resize from './resize'
 
 export default {
   mixins: [resize],
@@ -19,11 +19,11 @@ export default {
     },
     width: {
       type: String,
-      default: '200px'
+      default: '100%'
     },
     height: {
       type: String,
-      default: '200px'
+      default: '400px'
     }
   },
   data() {
