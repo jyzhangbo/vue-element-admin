@@ -10,16 +10,6 @@
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="恒温点:" prop="alarmTime">
-                <el-date-picker v-model="listTime.stableTime" type="datetime" placeholder="选择日期时间" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="降温点:" prop="alarmTime">
-                <el-date-picker v-model="listTime.downTime" type="datetime" placeholder="选择日期时间" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="6">
               <el-form-item label="终点:" prop="alarmTime">
                 <el-date-picker v-model="listTime.endTime" type="datetime" placeholder="选择日期时间" />
               </el-form-item>
@@ -31,19 +21,11 @@
                 </el-select>
               </el-form-item>
             </el-col>
-            <el-col :span="6">
-              <el-form-item label="间隔:" prop="dataSpace">
-                <el-input v-model="listTemp.dataSpace" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="随机分钟:" prop="randomTime">
-                <el-input v-model="listTemp.randomTime" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="3" :offset="3">
-              <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="simulationData()">模拟数据</el-button>
-            </el-col>
+          </el-row>
+          <el-row type="flex" justify="end">
+            <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="btnQuery()">查询</el-button>
+            <el-button type="info" icon="el-icon-magic-stick" @click="resetQuery('listQuery')">重置</el-button>
+            <el-button type="success" style="background-color: #42b983;" icon="el-icon-download" @click="exportTableData">导出</el-button>
           </el-row>
         </el-form>
       </div>
@@ -52,43 +34,12 @@
       <div class="chart-container">
         <div id="mnsjChart" style="width: 100%;height:400px;" />
       </div>
-      <div>
-        <el-row :gutter="5">
-          <el-col v-for="item in listTemp" :key="item.name" :span="3">
-            <el-card class="box-card" style="border-radius: 20px">
-              <div style="font-size:13px; padding-top:10px">
-                {{ item.name }}
-              </div>
-              <div style="font-size:13px; padding-top:10px">
-                <el-checkbox v-model="item.effective">
-                  有效性
-                </el-checkbox>
-              </div>
-              <div style="font-size:13px; padding-top:10px">
-                <el-input v-model="item.randomData" placeholder="浮动值" clearable />
-              </div>
-              <div style="font-size:13px; padding-top:10px">
-                <el-input v-model="item.startTemp" placeholder="起点" clearable />
-              </div>
-              <div style="font-size:13px; padding-top:10px">
-                <el-input v-model="item.stableTemp" placeholder="恒温点" clearable />
-              </div>
-              <div style="font-size:13px; padding-top:10px">
-                <el-input v-model="item.downTemp" placeholder="降温点" clearable />
-              </div>
-              <div class="card-panel-description" style="font-size:13px; padding-top:10px">
-                <el-input v-model="item.endTemp" placeholder="终点" clearable />
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
-      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { simulationData } from '@/api/simulation/index'
+import { queryData } from '@/api/data/index'
 import echarts from 'echarts'
 
 export default {
@@ -101,26 +52,6 @@ export default {
         downTime: '',
         endTime: ''
       },
-      listTemp: [{
-        startTemp: '',
-        stableTemp: '',
-        downTemp: '',
-        endTemp: '',
-        randomData: '',
-        deviceNum: '',
-        effective: true,
-        name: 'T1'
-      },
-      {
-        startTemp: '',
-        stableTemp: '',
-        downTemp: '',
-        endTemp: '',
-        randomData: '',
-        deviceNum: '',
-        effective: true,
-        name: 'T2'
-      }],
       options: [{
         value: '选项1',
         label: '黄金糕'
@@ -132,9 +63,12 @@ export default {
     this.initChart()
   },
   methods: {
+    resetQuery(formName) {
+      this.$refs[formName].resetFields()
+    },
     initChart() {
       this.chart = echarts.init(document.getElementById('mnsjChart'))
-      this.setOptionData()
+      this.btnQuery()
     },
     setOptionData(xDatas, seriesData, legendData) {
       this.chart.setOption({
@@ -183,8 +117,8 @@ export default {
         series: seriesData
       })
     },
-    simulationData() {
-      simulationData(this.listTime, this.listTemp).then(resp => {
+    btnQuery() {
+      queryData(this.listTime).then(resp => {
         var seriesData = []
         var legendData = []
         for (const item of resp.data.yDatas) {

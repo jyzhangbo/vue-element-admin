@@ -110,6 +110,19 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/data',
+    component: Layout,
+    redirect: '/data/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/data/index'),
+        name: '数据查询',
+        meta: { title: '数据查询', icon: 'user', noCache: true }
+      }
+    ]
+  },
+  {
     path: '/alarm',
     component: Layout,
     redirect: '/alarm/alarm-rule',

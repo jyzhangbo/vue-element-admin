@@ -1,12 +1,19 @@
 import request from '@/utils/request'
 
-export function getDeviceList(data) {
+export function getTaskList(data) {
   return request({
-    url: '/device/list',
+    url: '/task/list',
     method: 'post',
     data: {
-      companyName: data.companyName,
-      deviceNum: data.deviceNum
+    }
+  })
+}
+
+export function getTaskDeviceList(data) {
+  return request({
+    url: '/task/device/list',
+    method: 'post',
+    data: {
     }
   })
 }
