@@ -15,6 +15,13 @@
               </el-form-item>
             </el-col>
             <el-col :span="6">
+              <el-form-item label="任务编号:" prop="taskNum">
+                <el-select v-model="listTime.deviceNum" placeholder="请选择">
+                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="6">
               <el-form-item label="设备编号:" prop="deviceNum">
                 <el-select v-model="listTime.deviceNum" placeholder="请选择">
                   <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />

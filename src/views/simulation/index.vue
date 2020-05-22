@@ -89,6 +89,7 @@
 
 <script>
 import { simulationData } from '@/api/simulation/index'
+import { queryData } from '@/api/data/index'
 import echarts from 'echarts'
 
 export default {
@@ -134,7 +135,20 @@ export default {
   methods: {
     initChart() {
       this.chart = echarts.init(document.getElementById('mnsjChart'))
-      this.setOptionData()
+      queryData(this.listTime).then(resp => {
+        var seriesData = []
+        var legendData = []
+        for (const item of resp.data.yDatas) {
+          var data = {
+            name: item.name,
+            type: 'line',
+            data: item.values
+          }
+          seriesData.push(data)
+          legendData.push(item.name)
+        }
+        this.setOptionData(resp.data.xDatas, seriesData, legendData)
+      })
     },
     setOptionData(xDatas, seriesData, legendData) {
       this.chart.setOption({

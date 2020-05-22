@@ -63,6 +63,9 @@
         <el-form-item label="密码" prop="password">
           <el-input v-model="temp.password" />
         </el-form-item>
+        <el-form-item>
+          <el-checkbox v-model="temp.admin">是否同时创建管理员</el-checkbox>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -91,7 +94,8 @@ export default {
         companyName: undefined,
         phone: undefined,
         loginName: undefined,
-        password: undefined
+        password: undefined,
+        admin: false
       },
       listQuery: {
         companyName: undefined,
@@ -130,7 +134,8 @@ export default {
         companyName: undefined,
         phone: undefined,
         loginName: undefined,
-        password: undefined
+        password: undefined,
+        admin: false
       }
     }
   }
