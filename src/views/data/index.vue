@@ -32,27 +32,47 @@
           <el-row type="flex" justify="end">
             <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="btnQuery()">查询</el-button>
             <el-button type="info" icon="el-icon-magic-stick" @click="resetQuery('listQuery')">重置</el-button>
-            <el-button type="success" style="background-color: #42b983;" icon="el-icon-download" @click="exportTableData">导出</el-button>
+            <el-button type="success" style="background-color: #42b983;" icon="el-icon-download">导出</el-button>
           </el-row>
         </el-form>
       </div>
     </div>
     <div class="panel-group" style="background-color:white">
-      <div class="chart-container">
+      <el-row class="panel-group">
+        <el-col :span="3" :offset="21">
+          <el-button type="primary" icon="el-icon-picture" @click="changeShow()">
+            切换视图
+          </el-button>
+        </el-col>
+      </el-row>
+      <div v-show="chartShow" id="chartDiv" class="chart-container">
         <div id="mnsjChart" style="width: 100%;height:400px;" />
+      </div>
+      <div v-show="!chartShow">
+        <el-table :data="tableData" border stripe style="width: 100%">
+          <el-table-column type="index" label="序号" width="50" />
+          <el-table-column prop="time" label="时间" width="180" />
+          <el-table-column v-for="(item, index) in tableHeader" :key="item" :label="item" width="180">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{ scope.row.values[index] }}</span>
+            </template>
+          </el-table-column>
+        </el-table>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { queryData } from '@/api/data/index'
+import { queryData, queryTableData } from '@/api/data/index'
 import echarts from 'echarts'
 
 export default {
   name: 'LineChart',
   data() {
     return {
+      tableHeader: ['T1', 'T2', 'T3', 'T4'],
+      chartShow: false,
       listTime: {
         startTime: '',
         stableTime: '',
@@ -63,19 +83,53 @@ export default {
         value: '选项1',
         label: '黄金糕'
       }],
-      chart: null
+      chart: null,
+      tableData: []
     }
   },
   mounted() {
-    this.initChart()
+    this.queryDataTable()
   },
   methods: {
+    changeShow() {
+      if (this.chartShow === true) {
+        this.chartShow = false
+      } else {
+        this.chartShow = true
+        this.initChart()
+      }
+    },
     resetQuery(formName) {
       this.$refs[formName].resetFields()
     },
     initChart() {
-      this.chart = echarts.init(document.getElementById('mnsjChart'))
+      var contain = document.getElementById('mnsjChart')
+      contain.style.width = window.innerWidth - 300 + 'px'
+      contain.style.height = '300px'
+      this.chart = echarts.init(contain)
       this.btnQuery()
+    },
+    queryDataTable() {
+      queryTableData().then(resp => {
+        this.tableData = resp.data.datas
+        console.log(this.tableData[0])
+      })
+    },
+    btnQuery() {
+      queryData(this.listTime).then(resp => {
+        var seriesData = []
+        var legendData = []
+        for (const item of resp.data.yDatas) {
+          var data = {
+            name: item.name,
+            type: 'line',
+            data: item.values
+          }
+          seriesData.push(data)
+          legendData.push(item.name)
+        }
+        this.setOptionData(resp.data.xDatas, seriesData, legendData)
+      })
     },
     setOptionData(xDatas, seriesData, legendData) {
       this.chart.setOption({
@@ -86,11 +140,8 @@ export default {
           data: legendData
         },
         toolbox: {
+          itemSize: 30,
           feature: {
-            dataView: {
-              show: true,
-              readOnly: false
-            },
             saveAsImage: {
               show: true
             }
@@ -122,22 +173,6 @@ export default {
           }
         }],
         series: seriesData
-      })
-    },
-    btnQuery() {
-      queryData(this.listTime).then(resp => {
-        var seriesData = []
-        var legendData = []
-        for (const item of resp.data.yDatas) {
-          var data = {
-            name: item.name,
-            type: 'line',
-            data: item.values
-          }
-          seriesData.push(data)
-          legendData.push(item.name)
-        }
-        this.setOptionData(resp.data.xDatas, seriesData, legendData)
       })
     }
   }

@@ -41,16 +41,46 @@
                 <el-input v-model="listTemp.randomTime" />
               </el-form-item>
             </el-col>
-            <el-col :span="3" :offset="3">
+            <el-col :span="6">
               <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="simulationData()">模拟数据</el-button>
+              <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="copyData()">复制数据</el-button>
             </el-col>
           </el-row>
         </el-form>
       </div>
     </div>
     <div class="panel-group" style="background-color:white">
-      <div class="chart-container">
-        <div id="mnsjChart" style="width: 100%;height:400px;" />
+      <el-row class="panel-group">
+        <el-col :span="3" :offset="21">
+          <el-button type="primary" icon="el-icon-picture" @click="changeShow()">
+            切换视图
+          </el-button>
+        </el-col>
+      </el-row>
+      <div v-show="chartShow" id="chartDiv" class="chart-container">
+        <div id="mnsjChart" style="width:100%;height:400px;" />
+      </div>
+      <div v-show="!chartShow">
+        <el-table :data="tabledatas" border>
+          <el-table-column label="tab1">
+            <template slot-scope="scope">
+              <el-input v-show="scope.row.show" v-model="scope.row.tab1" placeholder="请输入内容" />
+              <span v-show="!scope.row.show">{{ scope.row.tab1 }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="tab2">
+            <template slot-scope="scope">
+              <el-input v-show="scope.row.show" v-model="scope.row.tab2" placeholder="请输入内容" />
+              <span v-show="!scope.row.show">{{ scope.row.tab2 }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作">
+            <template slot-scope="scope">
+              <el-button @click="scope.row.show =true">编辑</el-button>
+              <el-button @click="scope.row.show =false">保存</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
       </div>
       <div>
         <el-row :gutter="5">
@@ -84,6 +114,30 @@
         </el-row>
       </div>
     </div>
+    <el-dialog title="数据复制" :visible.sync="dialogFormVisible">
+      <el-card class="box-card" style="border-radius: 20px">
+        <el-select v-model="listTime.deviceNum" placeholder="请选择">
+          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+        </el-select>
+      </el-card>
+      <el-card class="box-card" style="border-radius: 20px">
+        <el-input v-model="copyDataInput.addData" placeholder="固定增加数" clearable />
+        <el-input v-model="copyDataInput.randomData" placeholder="随机变动数" clearable />
+      </el-card>
+      <el-card class="box-card" style="border-radius: 20px">
+        <el-checkbox-group v-model="checkedCities">
+          <el-checkbox v-for="city in cities" :key="city" :label="city">{{ city }}</el-checkbox>
+        </el-checkbox-group>
+      </el-card>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">
+          Cancel
+        </el-button>
+        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+          Confirm
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -91,11 +145,18 @@
 import { simulationData } from '@/api/simulation/index'
 import { queryData } from '@/api/data/index'
 import echarts from 'echarts'
+import resize from '@/components/Charts/mixins/resize'
 
 export default {
   name: 'LineChart',
+  mixins: [resize],
   data() {
     return {
+      dialogFormVisible: false,
+      copyDataInput: {
+        addData: '',
+        randomData: ''
+      },
       listTime: {
         startTime: '',
         stableTime: '',
@@ -126,15 +187,33 @@ export default {
         value: '选项1',
         label: '黄金糕'
       }],
-      chart: null
+      chart: null,
+      tabledatas: [
+        { tab1: '111', tab2: '2222', show: true },
+        { tab1: 'aaa', tab2: 'bbb', show: false }
+      ],
+      chartShow: false,
+      checkedCities: ['上海', '北京'],
+      cities: ['上海', '北京', '广州', '深圳']
     }
   },
-  mounted() {
-    this.initChart()
-  },
   methods: {
+    copyData() {
+      this.dialogFormVisible = true
+    },
+    changeShow() {
+      if (this.chartShow === true) {
+        this.chartShow = false
+      } else {
+        this.chartShow = true
+        this.initChart()
+      }
+    },
     initChart() {
-      this.chart = echarts.init(document.getElementById('mnsjChart'))
+      var contain = document.getElementById('mnsjChart')
+      contain.style.width = window.innerWidth - 300 + 'px'
+      contain.style.height = '300px'
+      this.chart = echarts.init(contain)
       queryData(this.listTime).then(resp => {
         var seriesData = []
         var legendData = []
@@ -160,10 +239,6 @@ export default {
         },
         toolbox: {
           feature: {
-            dataView: {
-              show: true,
-              readOnly: false
-            },
             saveAsImage: {
               show: true
             }

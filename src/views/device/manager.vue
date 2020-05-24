@@ -37,9 +37,11 @@
         <el-form-item label="设备编号">
           <el-input v-model="temp.deviceNum" disabled="" />
         </el-form-item>
+        <el-form-item label="采集频率">
+          <el-input v-model="temp.deviceNum" />
+        </el-form-item>
         <el-form-item v-for="item in temp.devicePin" :key="item.name" label="引脚名">
           <el-input v-model="item.name" placeholder="引脚名称" clearable />
-          <el-checkbox v-model="item.used">是否使用</el-checkbox>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

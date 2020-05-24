@@ -9,3 +9,12 @@ export function queryData(listTime) {
   })
 }
 
+export function queryTableData() {
+  return request({
+    url: '/data/query/table',
+    method: 'post',
+    data: {
+    }
+  })
+}
+
