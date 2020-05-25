@@ -19,6 +19,7 @@
     <el-table :data="tableData" border stripe style="width: 100%">
       <el-table-column type="index" label="序号" width="50" />
       <el-table-column prop="deviceNum" label="设备编号" width="180" />
+      <el-table-column prop="deviceName" label="设备名称" width="180" />
       <el-table-column label="操作">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="btnEdit(row)">
@@ -36,6 +37,9 @@
       <el-form ref="dataForm" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
         <el-form-item label="设备编号">
           <el-input v-model="temp.deviceNum" disabled="" />
+        </el-form-item>
+        <el-form-item label="设备名称">
+          <el-input v-model="temp.deviceName" />
         </el-form-item>
         <el-form-item label="采集频率">
           <el-input v-model="temp.deviceNum" />
@@ -64,6 +68,7 @@ export default {
       dialogFormVisible: false,
       temp: {
         deviceNum: undefined,
+        deviceName: undefined,
         devicePin: [
           {
             name: 'aaa'

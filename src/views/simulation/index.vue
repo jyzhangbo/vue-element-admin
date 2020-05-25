@@ -115,20 +115,28 @@
       </div>
     </div>
     <el-dialog title="数据复制" :visible.sync="dialogFormVisible">
-      <el-card class="box-card" style="border-radius: 20px">
-        <el-select v-model="listTime.deviceNum" placeholder="请选择">
-          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-        </el-select>
-      </el-card>
-      <el-card class="box-card" style="border-radius: 20px">
-        <el-input v-model="copyDataInput.addData" placeholder="固定增加数" clearable />
-        <el-input v-model="copyDataInput.randomData" placeholder="随机变动数" clearable />
-      </el-card>
-      <el-card class="box-card" style="border-radius: 20px">
-        <el-checkbox-group v-model="checkedCities">
-          <el-checkbox v-for="city in cities" :key="city" :label="city">{{ city }}</el-checkbox>
-        </el-checkbox-group>
-      </el-card>
+      <el-row :gutter="10">
+        <el-col span="8">
+          <el-card class="box-card" style="border-radius: 20px">
+            <el-select v-model="listTime.deviceNum" placeholder="请选择">
+              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+          </el-card>
+        </el-col>
+        <el-col span="8">
+          <el-card class="box-card" style="border-radius: 20px">
+            <el-input v-model="copyDataInput.addData" placeholder="固定增加数" clearable />
+            <el-input v-model="copyDataInput.randomData" placeholder="随机变动数" clearable />
+          </el-card>
+        </el-col>
+        <el-col span="8">
+          <el-card class="box-card" style="border-radius: 20px">
+            <el-checkbox-group v-model="checkedCities">
+              <el-checkbox v-for="city in cities" :key="city" :label="city">{{ city }}</el-checkbox>
+            </el-checkbox-group>
+          </el-card>
+        </el-col>
+      </el-row>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           Cancel
