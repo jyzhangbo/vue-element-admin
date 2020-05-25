@@ -167,6 +167,24 @@ export const asyncRoutes = [
     ]
   },
   {
+    path: '/picture',
+    component: Layout,
+    redirect: '/picture/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/picture/index'),
+        name: '图片管理',
+        meta: {
+          title: '图片管理',
+          icon: 'user',
+          noCache: true,
+          roles: ['admin']
+        }
+      }
+    ]
+  },
+  {
     path: '/simulation',
     component: Layout,
     redirect: '/simulation/index',

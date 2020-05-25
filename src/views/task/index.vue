@@ -66,8 +66,8 @@
         </el-form-item>
         <el-form-item label="设备列表" prop="devices">
           <el-checkbox-group v-model="temp.devices">
-            <el-row :gutter="60">
-              <el-col v-for="item in deviceList" :key="item" :span="3">
+            <el-row>
+              <el-col v-for="item in deviceList" :key="item" :span="12">
                 <el-checkbox :label="item" />
               </el-col>
             </el-row>

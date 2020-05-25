@@ -35,14 +35,6 @@ module.exports = {
     overlay: {
       warnings: false,
       errors: true
-    },
-    proxy: {
-      '/*': {
-        target: 'http://localhost:8080/',
-        ws: true,
-        secure: false,
-        changeOrigin: true
-      }
     }
   },
   configureWebpack: {
