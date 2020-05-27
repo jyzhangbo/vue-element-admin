@@ -27,9 +27,9 @@
       <el-table-column prop="taskName" label="名称" width="180" />
       <el-table-column prop="taskNum" label="编号" width="180" />
       <el-table-column prop="state" label="状态" width="90" />
-      <el-table-column prop="devices" label="设备列表" width="180">
+      <el-table-column prop="deviceNums" label="设备列表" width="180">
         <template slot-scope="scope">
-          {{ scope.row.devices|splitDevice }}
+          {{ scope.row.deviceNums|splitDevice }}
         </template>
       </el-table-column>
       <el-table-column prop="startTime" label="开始时间" width="180" />
@@ -105,7 +105,7 @@ export default {
       temp: {
         taskName: undefined,
         taskNum: undefined,
-        devices: []
+        deviceNums: []
       },
       listQuery: {
         taskName: undefined,
@@ -130,8 +130,11 @@ export default {
       this.$refs[formName].resetFields()
     },
     btnQuery() {
-      getTaskList(this.listQuery).then(resp => {
+      getTaskList(this.listQuery, this.tablePage).then(resp => {
         this.tableData = resp.data.tasks
+        for (var i = 0; i < this.tableData.devices.length; i++) {
+          this.tableData.deviceNums.push(this.tableData.devices[i])
+        }
         this.tablePage.total = resp.data.total
       })
     },
@@ -149,7 +152,7 @@ export default {
       this.temp = {
         taskName: undefined,
         taskNum: undefined,
-        devices: []
+        deviceNums: []
       }
     }
   }

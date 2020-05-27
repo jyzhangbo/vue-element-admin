@@ -80,7 +80,7 @@
 </template>
 
 <script>
-import { getUserList } from '@/api/user/index'
+import { listUser, deleteUser, addUser, editUser } from '@/api/user/index'
 export default {
   data() {
     return {
@@ -114,9 +114,24 @@ export default {
       this.$refs[formName].resetFields()
     },
     btnQuery() {
-      getUserList(this.listQuery).then(resp => {
+      listUser(this.listQuery, this.tablePage).then(resp => {
         this.tableData = resp.data.infos
         this.tablePage.total = resp.data.total
+      })
+    },
+    btnDel(row) {
+      deleteUser(row.loginName).then(resp => {
+        this.btnQuery()
+      })
+    },
+    createData() {
+      addUser(this.temp).then(resp => {
+        this.btnQuery()
+      })
+    },
+    updateData() {
+      editUser(this.temp).then(resp => {
+        this.btnQuery
       })
     },
     btnEdit(row) {

@@ -27,7 +27,6 @@
       <el-table-column type="index" label="序号" width="50" />
       <el-table-column prop="deviceNum" label="设备编号" width="180" />
       <el-table-column prop="companyName" label="厂家名称" width="180" />
-      <el-table-column prop="phone" label="联系电话" width="180" />
       <el-table-column label="操作">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="btnEdit(row)">
