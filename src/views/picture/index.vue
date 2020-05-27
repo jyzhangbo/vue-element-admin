@@ -8,7 +8,6 @@
         :on-remove="handleRemove"
         :file-list="fileList"
         list-type="picture-card"
-        disabled
       >
         <!-- <i class="el-icon-plus" /> -->
       </el-upload>
