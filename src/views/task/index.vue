@@ -132,7 +132,7 @@ export default {
     btnQuery() {
       getTaskList(this.listQuery, this.tablePage).then(resp => {
         this.tableData = resp.data.tasks
-        for (var i = 0; i < this.tableData.devices.length; i++) {
+        for (var i = 0; i < this.tableData.devices.length(); i++) {
           this.tableData.deviceNums.push(this.tableData.devices[i])
         }
         this.tablePage.total = resp.data.total

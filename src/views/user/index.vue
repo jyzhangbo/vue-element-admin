@@ -14,7 +14,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="登陆名" prop="loginName">
+            <el-form-item label="登录名" prop="loginName">
               <el-input v-model="listQuery.loginName" />
             </el-form-item>
           </el-col>
@@ -31,8 +31,13 @@
       <el-table-column type="index" label="序号" width="50" />
       <el-table-column prop="companyName" label="厂家名称" width="180" />
       <el-table-column prop="phone" label="联系电话" width="180" />
-      <el-table-column prop="loginName" label="登陆名" width="180" />
+      <el-table-column prop="loginName" label="登录名" width="180" />
       <el-table-column prop="password" label="密码" width="180" />
+      <el-table-column prop="userRole" label="角色" width="180">
+        <template slot-scope="scope">
+          {{ scope.row.userRole|userRoleFunc }}
+        </template>
+      </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="btnEdit(row)">
@@ -57,22 +62,22 @@
         <el-form-item label="联系电话" prop="phone">
           <el-input v-model="temp.phone" />
         </el-form-item>
-        <el-form-item label="登陆名" prop="loginName">
+        <el-form-item label="登录名" prop="loginName">
           <el-input v-model="temp.loginName" />
         </el-form-item>
         <el-form-item label="密码" prop="password">
           <el-input v-model="temp.password" />
         </el-form-item>
         <el-form-item>
-          <el-checkbox v-model="temp.admin">是否同时创建管理员</el-checkbox>
+          <el-checkbox v-model="temp.admin" :disabled="adminCheckBox">是否管理员</el-checkbox>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
-          Cancel
+          取消
         </el-button>
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          Confirm
+          确认
         </el-button>
       </div>
     </el-dialog>
@@ -82,13 +87,25 @@
 <script>
 import { listUser, deleteUser, addUser, editUser } from '@/api/user/index'
 export default {
+  filters: {
+    userRoleFunc(val) {
+      if (val === 'admin') {
+        return '超级管理员'
+      } else if (val === 'userAdmin') {
+        return '普通管理员'
+      } else {
+        return '用户'
+      }
+    }
+  },
   data() {
     return {
+      adminCheckBox: false,
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        edit: 'Edit',
-        create: 'Create'
+        edit: '修改',
+        create: '创建'
       },
       temp: {
         companyName: undefined,
@@ -127,22 +144,31 @@ export default {
     createData() {
       addUser(this.temp).then(resp => {
         this.btnQuery()
+        this.dialogFormVisible = false
       })
     },
     updateData() {
       editUser(this.temp).then(resp => {
-        this.btnQuery
+        this.btnQuery()
+        this.dialogFormVisible = false
       })
     },
     btnEdit(row) {
       this.temp = Object.assign({}, row)
+      if (row.userRole === 'user') {
+        this.temp.admin = false
+      } else {
+        this.temp.admin = true
+      }
       this.dialogFormVisible = true
       this.dialogStatus = 'edit'
+      this.adminCheckBox = true
     },
     btnCreate() {
       this.resetTemp()
       this.dialogFormVisible = true
       this.dialogStatus = 'create'
+      this.adminCheckBox = false
     },
     resetTemp() {
       this.temp = {

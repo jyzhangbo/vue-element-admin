@@ -5,7 +5,7 @@
         <el-row>
           <el-col :span="8">
             <el-form-item label="厂家名称" prop="companyName">
-              <el-input v-model="listQuery.companyName" />
+              <company-name-select v-model="listQuery.companyName" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -49,17 +49,15 @@
           <el-input v-model="temp.deviceNum" />
         </el-form-item>
         <el-form-item label="厂家名称" prop="companyName">
-          <el-select v-model="temp.companyName" placeholder="请选择">
-            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
+          <company-name-select v-model="temp.companyName" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
-          Cancel
+          取消
         </el-button>
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          Confirm
+          确认
         </el-button>
       </div>
     </el-dialog>
@@ -67,15 +65,18 @@
 </template>
 
 <script>
-import { getDeviceList } from '@/api/device/index'
+import { listDeviceAdmin, addDevice, deleteDevice, editDeviceAdmin } from '@/api/device/index'
+import CompanyNameSelect from '@/components/biz/CompanyNameSelect'
+
 export default {
+  components: { CompanyNameSelect },
   data() {
     return {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        edit: 'Edit',
-        create: 'Create'
+        edit: '修改',
+        create: '新增'
       },
       temp: {
         companyName: undefined,
@@ -86,14 +87,7 @@ export default {
         deviceNum: undefined
       },
       tablePage: { total: 0, pageSize: 10, pageNumber: 1 },
-      tableData: [],
-      options: [{
-        value: '选项1',
-        label: '黄金糕'
-      }, {
-        value: '选项2',
-        label: '双皮奶'
-      }]
+      tableData: []
     }
   },
   created() {
@@ -104,9 +98,14 @@ export default {
       this.$refs[formName].resetFields()
     },
     btnQuery() {
-      getDeviceList(this.listQuery).then(resp => {
+      listDeviceAdmin(this.listQuery, this.tablePage).then(resp => {
         this.tableData = resp.data.infos
         this.tablePage.total = resp.data.total
+      })
+    },
+    btnDel(row) {
+      deleteDevice(row.deviceNum).then(resp => {
+        this.btnQuery()
       })
     },
     btnEdit(row) {
@@ -124,6 +123,18 @@ export default {
         companyName: undefined,
         deviceNum: undefined
       }
+    },
+    createData() {
+      addDevice(this.temp).then(resp => {
+        this.btnQuery()
+        this.dialogFormVisible = false
+      })
+    },
+    updateData() {
+      editDeviceAdmin(this.temp).then(resp => {
+        this.btnQuery()
+        this.dialogFormVisible = false
+      })
     }
   }
 }

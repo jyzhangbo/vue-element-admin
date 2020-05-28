@@ -4,8 +4,13 @@
       <el-form ref="listQuery" :model="listQuery" label-width="130px" style="padding-top:10px;">
         <el-row>
           <el-col :span="8">
-            <el-form-item label="设备编号" prop="devicNum">
-              <el-input v-model="listQuery.devicNum" />
+            <el-form-item label="设备编号" prop="deviceNum">
+              <el-input v-model="listQuery.deviceNum" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="设备名称" prop="deviceName">
+              <el-input v-model="listQuery.deviceName" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -42,15 +47,15 @@
           <el-input v-model="temp.deviceName" />
         </el-form-item>
         <el-form-item label="采集频率">
-          <el-input v-model="temp.deviceNum" />
+          <el-input v-model="temp.collectSpace" />
         </el-form-item>
-        <el-form-item v-for="item in temp.devicePin" :key="item.name" label="引脚名">
-          <el-input v-model="item.name" placeholder="引脚名称" clearable />
+        <el-form-item v-for="item in temp.attributeInfo" :key="item.code" :label="item.code">
+          <el-input v-model="item.name" />
         </el-form-item>
         <el-form-item label="设备图片">
           <el-image
             style="width: 100px; height: 100px"
-            :src="temp.devicePicture"
+            :src="temp.img"
             :preview-src-list="srcList"
           />
           <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="showPictures()">修改</el-button>
@@ -58,10 +63,10 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
-          Cancel
+          取消
         </el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          Confirm
+        <el-button type="primary" @click="updateData()">
+          确认
         </el-button>
       </div>
     </el-dialog>
@@ -75,7 +80,7 @@
 </template>
 
 <script>
-import { getDeviceList } from '@/api/device/index'
+import { listDeviceUser, editDeviceUser } from '@/api/device/index'
 export default {
   data() {
     return {
@@ -94,38 +99,32 @@ export default {
       temp: {
         deviceNum: undefined,
         deviceName: undefined,
-        devicePin: [
-          {
-            name: 'aaa'
-          },
-          {
-            name: 'bbb'
-          }
-        ],
-        devicePicture: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
+        attributeInfo: undefined,
+        img: undefined,
+        collectSpace: undefined
 
       },
       listQuery: {
-        deviceNum: undefined
+        deviceNum: undefined,
+        deviceName: undefined
       },
       tablePage: { total: 0, pageSize: 10, pageNumber: 1 },
-      tableData: [],
-      options: [{
-        value: '选项1',
-        label: '黄金糕'
-      }, {
-        value: '选项2',
-        label: '双皮奶'
-      }]
+      tableData: []
     }
   },
   created() {
     this.btnQuery()
   },
   methods: {
+    updateData() {
+      editDeviceUser(this.temp).then(resp => {
+        this.btnQuery()
+        this.dialogFormVisible = false
+      })
+    },
     confirmPicture(url) {
-      this.temp.devicePicture = url
-      this.srcList = [this.temp.devicePicture]
+      this.temp.img = url
+      this.srcList = [this.temp.img]
       this.dialogPictureVisible = false
     },
     showPictures() {
@@ -135,21 +134,15 @@ export default {
       this.$refs[formName].resetFields()
     },
     btnQuery() {
-      getDeviceList(this.listQuery).then(resp => {
+      listDeviceUser(this.listQuery, this.tablePage).then(resp => {
         this.tableData = resp.data.infos
         this.tablePage.total = resp.data.total
       })
     },
     btnEdit(row) {
       this.temp = Object.assign({}, row)
-      this.srcList = [this.temp.devicePicture]
+      this.srcList = [this.temp.img]
       this.dialogFormVisible = true
-    },
-    resetTemp() {
-      this.temp = {
-        deviceNum: undefined,
-        devicePin: []
-      }
     }
   }
 }
