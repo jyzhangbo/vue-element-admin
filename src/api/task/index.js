@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-export function getTaskList(data, tablePage) {
+export function listTask(data, tablePage) {
   return request({
     url: '/task/list',
     method: 'post',
@@ -14,11 +14,36 @@ export function getTaskList(data, tablePage) {
   })
 }
 
-export function getTaskDeviceList(data) {
+export function listDeviceTask(data) {
   return request({
-    url: '/task/device/list',
+    url: '/device/list/task',
     method: 'post',
     data: {
+      taskNum: data
+    }
+  })
+}
+
+export function editTask(data) {
+  return request({
+    url: '/task/edit',
+    method: 'post',
+    data: {
+      taskNum: data.taskNum,
+      devices: data.deviceNums,
+      state: data.state
+    }
+  })
+}
+
+export function addTask(data) {
+  return request({
+    url: '/task/add',
+    method: 'post',
+    data: {
+      taskNum: data.taskNum,
+      devices: data.deviceNums,
+      taskName: data.taskName
     }
   })
 }

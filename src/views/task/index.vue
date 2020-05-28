@@ -26,10 +26,14 @@
       <el-table-column type="index" label="序号" width="50" />
       <el-table-column prop="taskName" label="名称" width="180" />
       <el-table-column prop="taskNum" label="编号" width="180" />
-      <el-table-column prop="state" label="状态" width="90" />
-      <el-table-column prop="deviceNums" label="设备列表" width="180">
+      <el-table-column prop="taskStatus" label="状态" width="90">
         <template slot-scope="scope">
-          {{ scope.row.deviceNums|splitDevice }}
+          {{ scope.row.taskStatus|taskStatusFunc }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="devices" label="设备列表" width="180">
+        <template slot-scope="scope">
+          {{ scope.row.devices|splitDevice }}
         </template>
       </el-table-column>
       <el-table-column prop="startTime" label="开始时间" width="180" />
@@ -42,10 +46,10 @@
           <el-button type="primary" size="mini" @click="btnDel(row)">
             删除
           </el-button>
-          <el-button type="primary" size="mini" @click="btnDel(row)">
+          <el-button type="primary" size="mini" @click="btnChangeStatus(row,1)">
             开启
           </el-button>
-          <el-button type="primary" size="mini" @click="btnDel(row)">
+          <el-button type="primary" size="mini" @click="btnChangeStatus(row,2)">
             结束
           </el-button>
         </template>
@@ -65,10 +69,12 @@
           <el-input v-model="temp.taskNum" />
         </el-form-item>
         <el-form-item label="设备列表" prop="devices">
-          <el-checkbox-group v-model="temp.devices">
+          <el-checkbox-group v-model="temp.deviceNums">
             <el-row>
-              <el-col v-for="item in deviceList" :key="item" :span="12">
-                <el-checkbox :label="item" />
+              <el-col v-for="item in deviceList" :key="item.deviceNum" :span="12">
+                <el-checkbox :label="item.deviceNum">
+                  {{ item.deviceName }}
+                </el-checkbox>
               </el-col>
             </el-row>
           </el-checkbox-group>
@@ -76,10 +82,10 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
-          Cancel
+          取消
         </el-button>
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          Confirm
+          确认
         </el-button>
       </div>
     </el-dialog>
@@ -87,11 +93,24 @@
 </template>
 
 <script>
-import { getTaskList, getTaskDeviceList } from '@/api/task/index'
+import { listTask, listDeviceTask, editTask, addTask } from '@/api/task/index'
 export default {
   filters: {
-    splitDevice(val) {
+    splitDevice(devices) {
+      var val = []
+      for (var i = 0; i < devices.length; i++) {
+        val.push(devices[i].deviceNum)
+      }
       return val.join(';')
+    },
+    taskStatusFunc(taskStatus) {
+      if (taskStatus === 0) {
+        return '创建中'
+      } else if (taskStatus === 1) {
+        return '执行中'
+      } else {
+        return '结束'
+      }
     }
   },
   data() {
@@ -99,8 +118,8 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        edit: 'Edit',
-        create: 'Create'
+        edit: '编辑',
+        create: '增加'
       },
       temp: {
         taskName: undefined,
@@ -118,11 +137,38 @@ export default {
   },
   created() {
     this.btnQuery()
-    this.queryDeviceList()
   },
   methods: {
-    queryDeviceList() {
-      getTaskDeviceList().then(resp => {
+    btnChangeStatus(row, status) {
+      var deviceNums = []
+      for (var i = 0; i < row.devices.length; i++) {
+        deviceNums.push(row.devices[i].deviceNum)
+      }
+
+      var data = {
+        state: status,
+        taskNum: row.taskNum,
+        deviceNums: deviceNums
+      }
+      editTask(data).then(resp => {
+        this.btnQuery()
+        this.dialogFormVisible = false
+      })
+    },
+    updateData() {
+      editTask(this.temp).then(resp => {
+        this.btnQuery()
+        this.dialogFormVisible = false
+      })
+    },
+    createData() {
+      addTask(this.temp).then(resp => {
+        this.btnQuery()
+        this.dialogFormVisible = false
+      })
+    },
+    queryDeviceList(taskNum) {
+      listDeviceTask(taskNum).then(resp => {
         this.deviceList = resp.data
       })
     },
@@ -130,23 +176,26 @@ export default {
       this.$refs[formName].resetFields()
     },
     btnQuery() {
-      getTaskList(this.listQuery, this.tablePage).then(resp => {
+      listTask(this.listQuery, this.tablePage).then(resp => {
         this.tableData = resp.data.tasks
-        for (var i = 0; i < this.tableData.devices.length(); i++) {
-          this.tableData.deviceNums.push(this.tableData.devices[i])
-        }
         this.tablePage.total = resp.data.total
       })
     },
     btnEdit(row) {
-      this.temp = Object.assign({}, row)
+      this.temp.taskName = row.taskName
+      this.temp.taskNum = row.taskNum
+      for (var i = 0; i < row.devices.length; i++) {
+        this.temp.deviceNums.push(row.devices[i].deviceNum)
+      }
       this.dialogFormVisible = true
       this.dialogStatus = 'edit'
+      this.queryDeviceList(row.taskNum)
     },
     btnCreate() {
       this.resetTemp()
       this.dialogFormVisible = true
       this.dialogStatus = 'create'
+      this.queryDeviceList()
     },
     resetTemp() {
       this.temp = {
