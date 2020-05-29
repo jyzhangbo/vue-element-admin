@@ -9,3 +9,11 @@ export function listCompanyName(data) {
   })
 }
 
+export function listTaskDevice(data) {
+  return request({
+    url: '/base/list/task/device',
+    method: 'post',
+    data: {
+    }
+  })
+}

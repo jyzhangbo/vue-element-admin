@@ -3,7 +3,7 @@
     <div class="panel-group" style="background-color:white">
       <div>
         <el-form ref="listTime" :model="listTime" label-width="130px">
-          <el-row :gutter="5">
+          <el-row :gutter="20">
             <el-col :span="6">
               <el-form-item label="起点:" prop="alarmObject">
                 <el-date-picker v-model="listTime.startTime" type="datetime" placeholder="选择日期时间" />
@@ -15,17 +15,8 @@
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="任务编号:" prop="taskNum">
-                <el-select v-model="listTime.deviceNum" placeholder="请选择">
-                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="设备编号:" prop="deviceNum">
-                <el-select v-model="listTime.deviceNum" placeholder="请选择">
-                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
+              <el-form-item label="设备编号:">
+                <task-device-select v-model="listTime.deviceNum" />
               </el-form-item>
             </el-col>
           </el-row>
@@ -52,9 +43,9 @@
         <el-table :data="tableData" border stripe style="width: 100%">
           <el-table-column type="index" label="序号" width="50" />
           <el-table-column prop="time" label="时间" width="180" />
-          <el-table-column v-for="(item, index) in tableHeader" :key="item" :label="item" width="180">
+          <el-table-column v-for="(value, key) in tableHeader" :key="key" :label="value" width="180">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.values[index] }}</span>
+              <span style="margin-left: 10px">{{ scope.row.values[key] }}</span>
             </template>
           </el-table-column>
         </el-table>
@@ -66,23 +57,22 @@
 <script>
 import { queryData, queryTableData } from '@/api/data/index'
 import echarts from 'echarts'
+import TaskDeviceSelect from '@/components/biz/TaskDeviceSelect'
 
 export default {
   name: 'LineChart',
+  components: {
+    TaskDeviceSelect
+  },
   data() {
     return {
-      tableHeader: ['T1', 'T2', 'T3', 'T4'],
+      tableHeader: {},
       chartShow: false,
       listTime: {
         startTime: '',
-        stableTime: '',
-        downTime: '',
+        deviceNum: [],
         endTime: ''
       },
-      options: [{
-        value: '选项1',
-        label: '黄金糕'
-      }],
       chart: null,
       tableData: []
     }
@@ -94,6 +84,7 @@ export default {
     changeShow() {
       if (this.chartShow === true) {
         this.chartShow = false
+        this.queryDataTable()
       } else {
         this.chartShow = true
         this.initChart()
@@ -110,26 +101,31 @@ export default {
       this.btnQuery()
     },
     queryDataTable() {
-      queryTableData().then(resp => {
+      queryTableData(this.listTime).then(resp => {
         this.tableData = resp.data.datas
-        console.log(this.tableData[0])
+        this.listTime.deviceNum = resp.data.deviceNum
+        this.tableHeader = resp.data.tableHeader
       })
     },
     btnQuery() {
-      queryData(this.listTime).then(resp => {
-        var seriesData = []
-        var legendData = []
-        for (const item of resp.data.yDatas) {
-          var data = {
-            name: item.name,
-            type: 'line',
-            data: item.values
+      if (this.chartShow === false) {
+        this.queryDataTable()
+      } else {
+        queryData(this.listTime).then(resp => {
+          var seriesData = []
+          var legendData = []
+          for (const item of resp.data.yDatas) {
+            var data = {
+              name: item.name,
+              type: 'line',
+              data: item.values
+            }
+            seriesData.push(data)
+            legendData.push(item.name)
           }
-          seriesData.push(data)
-          legendData.push(item.name)
-        }
-        this.setOptionData(resp.data.xDatas, seriesData, legendData)
-      })
+          this.setOptionData(resp.data.xDatas, seriesData, legendData)
+        })
+      }
     },
     setOptionData(xDatas, seriesData, legendData) {
       this.chart.setOption({
