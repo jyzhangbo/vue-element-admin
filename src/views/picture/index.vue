@@ -2,7 +2,7 @@
   <div class="dashboard-editor-container">
     <div class="panel-group" style="background-color:white">
       <el-upload
-        action="http://localhost:8080/file/upload"
+        action="http://114.55.171.27/file/upload"
         name="upfile"
         :on-preview="handlePreview"
         :on-remove="handleRemove"

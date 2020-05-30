@@ -25,10 +25,8 @@
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="设备编号:" prop="deviceNum">
-                <el-select v-model="listTime.deviceNum" placeholder="请选择">
-                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
+              <el-form-item label="设备编号:">
+                <task-device-select v-model="listTime.deviceNum" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -154,9 +152,13 @@ import { simulationData } from '@/api/simulation/index'
 import { queryData } from '@/api/data/index'
 import echarts from 'echarts'
 import resize from '@/components/Charts/mixins/resize'
+import TaskDeviceSelect from '@/components/biz/TaskDeviceSelect'
 
 export default {
   name: 'LineChart',
+  components: {
+    TaskDeviceSelect
+  },
   mixins: [resize],
   data() {
     return {
@@ -169,7 +171,8 @@ export default {
         startTime: '',
         stableTime: '',
         downTime: '',
-        endTime: ''
+        endTime: '',
+        deviceNum: []
       },
       listTemp: [{
         startTemp: '',

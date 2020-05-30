@@ -122,6 +122,7 @@ export default {
     },
     showPictures() {
       this.dialogPictureVisible = true
+      this.urls = []
       listImg().then(resp => {
         for (var i = 0; i < resp.data.length; i++) {
           this.urls.push(resp.data[i].url)
