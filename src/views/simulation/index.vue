@@ -5,23 +5,23 @@
         <el-form ref="listTime" :model="listTime" label-width="130px">
           <el-row :gutter="5">
             <el-col :span="6">
-              <el-form-item label="起点:" prop="alarmObject">
-                <el-date-picker v-model="listTime.startTime" type="datetime" placeholder="选择日期时间" />
+              <el-form-item label="起点:" prop="startTime">
+                <el-date-picker v-model="listTime.startTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="恒温点:" prop="alarmTime">
-                <el-date-picker v-model="listTime.stableTime" type="datetime" placeholder="选择日期时间" />
+              <el-form-item label="恒温点:" prop="stableTime">
+                <el-date-picker v-model="listTime.stableTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="降温点:" prop="alarmTime">
-                <el-date-picker v-model="listTime.downTime" type="datetime" placeholder="选择日期时间" />
+              <el-form-item label="降温点:" prop="downTime">
+                <el-date-picker v-model="listTime.downTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="终点:" prop="alarmTime">
-                <el-date-picker v-model="listTime.endTime" type="datetime" placeholder="选择日期时间" />
+              <el-form-item label="终点:" prop="endTime">
+                <el-date-picker v-model="listTime.endTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -30,18 +30,19 @@
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="间隔:" prop="dataSpace">
-                <el-input v-model="listTemp.dataSpace" />
+              <el-form-item label="间隔(分钟):" prop="timeSpace">
+                <el-input v-model="listTime.timeSpace" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="随机分钟:" prop="randomTime">
-                <el-input v-model="listTemp.randomTime" />
+                <el-input v-model="listTime.randomTime" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
+              <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="btnQuery()">查询</el-button>
               <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="simulationData()">模拟数据</el-button>
-              <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="copyData()">复制数据</el-button>
+              <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="copyDataToDiglog()">复制数据</el-button>
             </el-col>
           </el-row>
         </el-form>
@@ -59,23 +60,19 @@
         <div id="mnsjChart" style="width:100%;height:400px;" />
       </div>
       <div v-show="!chartShow">
-        <el-table :data="tabledatas" border>
-          <el-table-column label="tab1">
+        <el-table :data="tableData" border stripe style="width: 100%">
+          <el-table-column type="index" label="序号" width="50" />
+          <el-table-column prop="time" label="时间" width="180" />
+          <el-table-column v-for="(value, key) in tableHeader" :key="key" :label="value" width="150">
             <template slot-scope="scope">
-              <el-input v-show="scope.row.show" v-model="scope.row.tab1" placeholder="请输入内容" />
-              <span v-show="!scope.row.show">{{ scope.row.tab1 }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="tab2">
-            <template slot-scope="scope">
-              <el-input v-show="scope.row.show" v-model="scope.row.tab2" placeholder="请输入内容" />
-              <span v-show="!scope.row.show">{{ scope.row.tab2 }}</span>
+              <el-input v-show="scope.row.show" v-model="scope.row.values[key]" placeholder="请输入内容" />
+              <span v-show="!scope.row.show">{{ scope.row.values[key] }}</span>
             </template>
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button @click="scope.row.show =true">编辑</el-button>
-              <el-button @click="scope.row.show =false">保存</el-button>
+              <el-button @click="saveData(scope.row)">保存</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -114,33 +111,33 @@
     </div>
     <el-dialog title="数据复制" :visible.sync="dialogFormVisible">
       <el-row :gutter="10">
-        <el-col span="8">
+        <el-col :span="8">
           <el-card class="box-card" style="border-radius: 20px">
-            <el-select v-model="listTime.deviceNum" placeholder="请选择">
-              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+            <el-select v-model="copyDataInput.fromAttr" placeholder="请选择">
+              <el-option v-for="(value, key) in tableHeader" :key="key" :label="key" :value="key">{{ value }}</el-option>
             </el-select>
           </el-card>
         </el-col>
-        <el-col span="8">
+        <el-col :span="8">
           <el-card class="box-card" style="border-radius: 20px">
             <el-input v-model="copyDataInput.addData" placeholder="固定增加数" clearable />
             <el-input v-model="copyDataInput.randomData" placeholder="随机变动数" clearable />
           </el-card>
         </el-col>
-        <el-col span="8">
+        <el-col :span="8">
           <el-card class="box-card" style="border-radius: 20px">
-            <el-checkbox-group v-model="checkedCities">
-              <el-checkbox v-for="city in cities" :key="city" :label="city">{{ city }}</el-checkbox>
+            <el-checkbox-group v-model="copyDataInput.toAttr">
+              <el-checkbox v-for="(value, key) in tableHeader" :key="key" :label="key">{{ value }}</el-checkbox>
             </el-checkbox-group>
           </el-card>
         </el-col>
       </el-row>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
-          Cancel
+          取消
         </el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          Confirm
+        <el-button type="primary" @click="copyData()">
+          确认
         </el-button>
       </div>
     </el-dialog>
@@ -148,84 +145,124 @@
 </template>
 
 <script>
-import { simulationData } from '@/api/simulation/index'
-import { queryData } from '@/api/data/index'
+import { queryData, queryTableData, simulationData, changeData, copyData } from '@/api/data/index'
 import echarts from 'echarts'
-import resize from '@/components/Charts/mixins/resize'
 import TaskDeviceSelect from '@/components/biz/TaskDeviceSelect'
 
 export default {
-  name: 'LineChart',
   components: {
     TaskDeviceSelect
   },
-  mixins: [resize],
   data() {
     return {
+      tableHeader: {},
       dialogFormVisible: false,
-      copyDataInput: {
-        addData: '',
-        randomData: ''
-      },
+      chart: null,
+      tableData: [],
+      chartShow: false,
       listTime: {
         startTime: '',
         stableTime: '',
         downTime: '',
         endTime: '',
-        deviceNum: []
+        deviceNum: [],
+        timeSpace: '',
+        randomTime: ''
+
       },
-      listTemp: [{
-        startTemp: '',
-        stableTemp: '',
-        downTemp: '',
-        endTemp: '',
-        randomData: '',
-        deviceNum: '',
-        effective: true,
-        name: 'T1'
-      },
-      {
-        startTemp: '',
-        stableTemp: '',
-        downTemp: '',
-        endTemp: '',
-        randomData: '',
-        deviceNum: '',
-        effective: true,
-        name: 'T2'
-      }],
-      options: [{
-        value: '选项1',
-        label: '黄金糕'
-      }],
-      chart: null,
-      tabledatas: [
-        { tab1: '111', tab2: '2222', show: true },
-        { tab1: 'aaa', tab2: 'bbb', show: false }
-      ],
-      chartShow: false,
-      checkedCities: ['上海', '北京'],
-      cities: ['上海', '北京', '广州', '深圳']
+      listTemp: [],
+      copyDataInput: {
+        fromAttr: '',
+        toAttr: [],
+        addData: '',
+        randomData: ''
+      }
     }
+  },
+  mounted() {
+    this.btnQuery()
   },
   methods: {
     copyData() {
+      copyData(this.copyDataInput, this.listTime).then(resp => {
+        this.dialogFormVisible = false
+        this.btnQuery()
+        this.copyDataInput = {
+          fromAttr: '',
+          toAttr: [],
+          addData: '',
+          randomData: ''
+        }
+      })
+    },
+    copyDataToDiglog() {
       this.dialogFormVisible = true
+    },
+    saveData(row) {
+      row.show = false
+      changeData(row, this.listTime)
     },
     changeShow() {
       if (this.chartShow === true) {
         this.chartShow = false
+        this.queryDataTable()
       } else {
         this.chartShow = true
         this.initChart()
       }
+    },
+    btnQuery() {
+      if (this.chartShow === false) {
+        this.queryDataTable()
+      } else {
+        this.queryDataChart()
+      }
+    },
+    queryDataTable() {
+      queryTableData(this.listTime).then(resp => {
+        this.tableData = resp.data.datas
+        this.listTime.deviceNum = resp.data.deviceNum
+        this.tableHeader = resp.data.tableHeader
+        this.listTemp = []
+        for (var key in this.tableHeader) {
+          var tempData = {
+            name: this.tableHeader[key],
+            code: key,
+            startTemp: '',
+            stableTemp: '',
+            downTemp: '',
+            endTemp: '',
+            randomData: '',
+            effective: true
+          }
+          this.listTemp.push(tempData)
+        }
+      })
     },
     initChart() {
       var contain = document.getElementById('mnsjChart')
       contain.style.width = window.innerWidth - 300 + 'px'
       contain.style.height = '300px'
       this.chart = echarts.init(contain)
+      this.queryDataChart()
+    },
+    queryDataChart() {
       queryData(this.listTime).then(resp => {
+        this.tableHeader = resp.data.tableHeader
+        this.listTemp = []
+        for (var key in this.tableHeader) {
+          var tempData = {
+            name: this.tableHeader[key],
+            code: key,
+            startTemp: '',
+            stableTemp: '',
+            downTemp: '',
+            endTemp: '',
+            randomData: '',
+            effective: true
+          }
+          this.listTemp.push(tempData)
+        }
         var seriesData = []
         var legendData = []
         for (const item of resp.data.yDatas) {
@@ -284,19 +321,15 @@ export default {
       })
     },
     simulationData() {
-      simulationData(this.listTime, this.listTemp).then(resp => {
-        var seriesData = []
-        var legendData = []
-        for (const item of resp.data.yDatas) {
-          var data = {
-            name: item.name,
-            type: 'line',
-            data: item.values
-          }
-          seriesData.push(data)
-          legendData.push(item.name)
+      var temps = []
+      for (var i = 0; i < this.listTemp.length; i++) {
+        if (this.listTemp[i]['effective'] === true) {
+          temps.push(this.listTemp[i])
         }
-        this.setOptionData(resp.data.xDatas, seriesData, legendData)
+      }
+
+      simulationData(this.listTime, temps).then(resp => {
+        this.btnQuery()
       })
     }
   }
