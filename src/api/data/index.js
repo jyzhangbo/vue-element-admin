@@ -13,7 +13,7 @@ export function queryData(data) {
   })
 }
 
-export function queryTableData(data) {
+export function queryTableData(data, tablePage) {
   return request({
     url: '/data/query/table',
     method: 'post',
@@ -21,7 +21,9 @@ export function queryTableData(data) {
       startTime: data.startTime,
       endTime: data.endTime,
       taskNum: data.deviceNum[0],
-      deviceNum: data.deviceNum[1]
+      deviceNum: data.deviceNum[1],
+      pageNum: tablePage.pageNumber,
+      pageSize: tablePage.pageSize
     }
   })
 }
@@ -67,7 +69,9 @@ export function copyData(data, listTime) {
       fromAttr: data.fromAttr,
       toAttr: data.toAttr,
       addData: data.addData,
-      randomData: data.randomData
+      randomData: data.randomData,
+      startTime: listTime.startTime,
+      endTime: data.endTime
     }
   })
 }

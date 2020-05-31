@@ -13,13 +13,14 @@ import '@/styles/index.scss' // global css
 import App from './App'
 import store from './store'
 import router from './router'
+import moment from 'moment'
 
 import './icons' // icon
 import './permission' // permission control
 import './utils/error-log' // error log
 
 import * as filters from './filters' // global filters
-
+Vue.prototype.$moment = moment
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api

@@ -6,12 +6,12 @@
           <el-row :gutter="20">
             <el-col :span="6">
               <el-form-item label="起点:" prop="alarmObject">
-                <el-date-picker v-model="listTime.startTime" type="datetime" placeholder="选择日期时间" />
+                <el-date-picker v-model="listTime.startTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="终点:" prop="alarmTime">
-                <el-date-picker v-model="listTime.endTime" type="datetime" placeholder="选择日期时间" />
+                <el-date-picker v-model="listTime.endTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -49,7 +49,13 @@
             </template>
           </el-table-column>
         </el-table>
+        <div style="margin:auto;   width:60%">
+          <el-pagination layout="total, prev, pager, next, jumper" :page-size="tablePage.pageSize" :total="tablePage.total" @current-change="function(val){tablePage.pageNumber = val; queryDataTable();}" />
+        </div>
       </div>
+    </div>
+    <div class="panel-group" style="background-color:white">
+      <el-image style="width: 200px; height: 200px" :src="deviceImg" />
     </div>
   </div>
 </template>
@@ -58,6 +64,7 @@
 import { queryData, queryTableData } from '@/api/data/index'
 import echarts from 'echarts'
 import TaskDeviceSelect from '@/components/biz/TaskDeviceSelect'
+import moment from 'moment'
 
 export default {
   name: 'LineChart',
@@ -69,12 +76,14 @@ export default {
       tableHeader: {},
       chartShow: false,
       listTime: {
-        startTime: '',
+        startTime: moment().format('yyyy-MM-DD 00:00:00'),
         deviceNum: [],
         endTime: ''
       },
       chart: null,
-      tableData: []
+      tableData: [],
+      tablePage: { total: 0, pageSize: 10, pageNumber: 1 },
+      deviceImg: ''
     }
   },
   mounted() {
@@ -101,10 +110,12 @@ export default {
       this.btnQuery()
     },
     queryDataTable() {
-      queryTableData(this.listTime).then(resp => {
+      queryTableData(this.listTime, this.tablePage).then(resp => {
         this.tableData = resp.data.datas
         this.listTime.deviceNum = resp.data.deviceNum
         this.tableHeader = resp.data.tableHeader
+        this.tablePage.total = resp.data.total
+        this.deviceImg = resp.data.deviceImg
       })
     },
     btnQuery() {
@@ -124,6 +135,7 @@ export default {
             legendData.push(item.name)
           }
           this.setOptionData(resp.data.xDatas, seriesData, legendData)
+          this.deviceImg = resp.data.deviceImg
         })
       }
     },

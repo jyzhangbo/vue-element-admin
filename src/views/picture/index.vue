@@ -2,7 +2,7 @@
   <div class="dashboard-editor-container">
     <div class="panel-group" style="background-color:white">
       <el-upload
-        action="http://114.55.171.27/file/upload"
+        :action="uploadUrl"
         name="upfile"
         :on-preview="handlePreview"
         :on-remove="handleRemove"
@@ -27,7 +27,8 @@ export default {
       fileList: [
       ],
       dialogImageUrl: '',
-      dialogVisible: false
+      dialogVisible: false,
+      uploadUrl: ''
     }
   },
   created() {
@@ -35,6 +36,11 @@ export default {
   },
   methods: {
     queryImgs() {
+      if (process.env.NODE_ENV === 'development') {
+        this.uploadUrl = 'http://localhost:8080/file/upload'
+      } else {
+        this.uploadUrl = 'http://114.55.171.27/file/upload'
+      }
       listImg().then(resp => {
         this.fileList = resp.data
       })

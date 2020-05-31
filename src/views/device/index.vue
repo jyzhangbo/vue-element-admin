@@ -46,7 +46,7 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
         <el-form-item label="设备编号" prop="deviceNum">
-          <el-input v-model="temp.deviceNum" />
+          <el-input v-model="temp.deviceNum" :disabled="dialogStatus==='create'?false:true" />
         </el-form-item>
         <el-form-item label="厂家名称" prop="companyName">
           <company-name-select v-model="temp.companyName" />

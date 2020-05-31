@@ -76,6 +76,9 @@
             </template>
           </el-table-column>
         </el-table>
+        <div style="margin:auto;   width:60%">
+          <el-pagination layout="total, prev, pager, next, jumper" :page-size="tablePage.pageSize" :total="tablePage.total" @current-change="function(val){tablePage.pageNumber = val; queryDataTable();}" />
+        </div>
       </div>
       <div>
         <el-row :gutter="5">
@@ -148,6 +151,7 @@
 import { queryData, queryTableData, simulationData, changeData, copyData } from '@/api/data/index'
 import echarts from 'echarts'
 import TaskDeviceSelect from '@/components/biz/TaskDeviceSelect'
+import moment from 'moment'
 
 export default {
   components: {
@@ -161,7 +165,7 @@ export default {
       tableData: [],
       chartShow: false,
       listTime: {
-        startTime: '',
+        startTime: moment().format('yyyy-MM-DD 00:00:00'),
         stableTime: '',
         downTime: '',
         endTime: '',
@@ -176,7 +180,8 @@ export default {
         toAttr: [],
         addData: '',
         randomData: ''
-      }
+      },
+      tablePage: { total: 0, pageSize: 10, pageNumber: 1 }
     }
   },
   mounted() {
@@ -219,7 +224,7 @@ export default {
       }
     },
     queryDataTable() {
-      queryTableData(this.listTime).then(resp => {
+      queryTableData(this.listTime, this.tablePage).then(resp => {
         this.tableData = resp.data.datas
         this.listTime.deviceNum = resp.data.deviceNum
         this.tableHeader = resp.data.tableHeader
@@ -237,6 +242,7 @@ export default {
           }
           this.listTemp.push(tempData)
         }
+        this.tablePage.total = resp.data.total
       })
     },
     initChart() {
