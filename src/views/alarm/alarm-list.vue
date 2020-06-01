@@ -4,13 +4,13 @@
       <el-form ref="listQuery" :model="listQuery" label-width="130px" style="padding-top:10px;">
         <el-row>
           <el-col :span="8">
-            <el-form-item label="告警对象" prop="alarmObject">
-              <el-input v-model="listQuery.alarmObject" />
+            <el-form-item label="告警时间:" prop="alarmTime">
+              <el-date-picker v-model="listQuery.alarmTime" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="告警时间" prop="alarmTime">
-              <el-input v-model="listQuery.alarmTime" />
+            <el-form-item label="告警对象:" prop="alarmObject">
+              <el-input v-model="listQuery.alarmObject" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -23,28 +23,28 @@
 
     <el-table :data="tableData" border stripe style="width: 100%">
       <el-table-column type="index" label="序号" width="50" />
-      <el-table-column prop="alarmObject" label="告警对象" width="180" />
-      <el-table-column prop="alarmRule" label="告警条件" width="180" />
-      <el-table-column prop="alarmTime" label="告警时间" width="180" />
+      <el-table-column prop="alarmRuleObject" label="告警对象" width="180" />
+      <el-table-column prop="alarmRuleCondition" label="告警条件" width="180" />
+      <el-table-column prop="createTime" label="告警时间" width="180" />
       <el-table-column prop="deviceNum" label="设备编号" width="180" />
-      <el-table-column prop="collectId" label="采集点" width="180" />
+      <el-table-column prop="collectionPoint" label="采集点" />
     </el-table>
 
     <div style="margin:auto;   width:60%">
-      <el-pagination layout="total, prev, pager, next, jumper" :page-size="tablePage.pageSize" :total="tablePage.total" @current-change="function(val){tablePage.pageNumber = val; renderTable();}" />
+      <el-pagination layout="total, prev, pager, next, jumper" :current-page="tablePage.pageNumber" :page-size="tablePage.pageSize" :total="tablePage.total" @current-change="function(val){tablePage.pageNumber = val; renderTable();}" />
     </div>
 
   </div>
 </template>
 
 <script>
-import { getAlarmList } from '@/api/alarm/index'
+import { getAlarmLogList } from '@/api/alarm/index'
 export default {
   data() {
     return {
       listQuery: {
         alarmObject: undefined,
-        alarmTime: undefined
+        alarmTime: ['', '']
       },
       tablePage: { total: 0, pageSize: 10, pageNumber: 1 },
       tableData: []
@@ -58,7 +58,7 @@ export default {
       this.$refs[formName].resetFields()
     },
     btnQuery() {
-      getAlarmList(this.listQuery).then(resp => {
+      getAlarmLogList(this.listQuery, this.tablePage).then(resp => {
         this.tableData = resp.data.infos
         this.tablePage.total = resp.data.total
       })
