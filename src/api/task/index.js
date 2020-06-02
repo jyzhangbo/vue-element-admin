@@ -48,3 +48,13 @@ export function addTask(data) {
   })
 }
 
+export function deleteTask(data) {
+  return request({
+    url: '/task/delete',
+    method: 'post',
+    data: {
+      taskNum: data.taskNum
+    }
+  })
+}
+

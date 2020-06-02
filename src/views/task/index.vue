@@ -93,7 +93,7 @@
 </template>
 
 <script>
-import { listTask, listDeviceTask, editTask, addTask } from '@/api/task/index'
+import { listTask, listDeviceTask, editTask, addTask, deleteTask } from '@/api/task/index'
 export default {
   filters: {
     splitDevice(devices) {
@@ -139,6 +139,11 @@ export default {
     this.btnQuery()
   },
   methods: {
+    btnDel(row) {
+      deleteTask(row).then(resp => {
+        this.btnQuery()
+      })
+    },
     btnChangeStatus(row, status) {
       var deviceNums = []
       for (var i = 0; i < row.devices.length; i++) {
