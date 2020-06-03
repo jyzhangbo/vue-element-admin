@@ -35,7 +35,7 @@
     </el-table>
 
     <div style="margin:auto;   width:60%">
-      <el-pagination layout="total, prev, pager, next, jumper" :page-size="tablePage.pageSize" :total="tablePage.total" @current-change="function(val){tablePage.pageNumber = val; renderTable();}" />
+      <el-pagination layout="total, prev, pager, next, jumper" :page-size="tablePage.pageSize" :total="tablePage.total" @current-change="function(val){tablePage.pageNumber = val; btnQuery();}" />
     </div>
 
     <el-dialog title="编辑" :visible.sync="dialogFormVisible">
