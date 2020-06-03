@@ -16,7 +16,7 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="设备编号:">
-                <task-device-select v-model="listTime.deviceNum" />
+                <el-cascader v-model="listTime.deviceNum" :options="options" placeholder="请选择" clearable />
               </el-form-item>
             </el-col>
           </el-row>
@@ -54,23 +54,20 @@
         </div>
       </div>
     </div>
-    <div class="panel-group" style="background-color:white">
+    <!-- <div class="panel-group" style="background-color:white">
       <el-image style="width: 200px; height: 200px" :src="deviceImg" />
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
 import { queryData, queryTableData } from '@/api/data/index'
 import echarts from 'echarts'
-import TaskDeviceSelect from '@/components/biz/TaskDeviceSelect'
 import moment from 'moment'
+import { listTaskDevice } from '@/api/base/index'
 
 export default {
   name: 'LineChart',
-  components: {
-    TaskDeviceSelect
-  },
   data() {
     return {
       tableHeader: {},
@@ -87,9 +84,17 @@ export default {
     }
   },
   mounted() {
-    this.queryDataTable()
+    this.getDeviceNum()
   },
   methods: {
+    getDeviceNum() {
+      listTaskDevice().then(resp => {
+        this.options = resp.data
+        this.listTime.deviceNum.push(resp.data[0].value)
+        this.listTime.deviceNum.push(resp.data[0].children[0].value)
+        this.queryDataTable()
+      })
+    },
     changeShow() {
       if (this.chartShow === true) {
         this.chartShow = false
@@ -112,7 +117,6 @@ export default {
     queryDataTable() {
       queryTableData(this.listTime, this.tablePage).then(resp => {
         this.tableData = resp.data.datas
-        this.listTime.deviceNum = resp.data.deviceNum
         this.tableHeader = resp.data.tableHeader
         this.tablePage.total = resp.data.total
         this.deviceImg = resp.data.deviceImg

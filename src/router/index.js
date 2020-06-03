@@ -104,19 +104,6 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/deviceManager',
-    component: Layout,
-    redirect: '/deviceManager/manager',
-    children: [
-      {
-        path: 'manager',
-        component: () => import('@/views/device/manager'),
-        name: '设备管理',
-        meta: { title: '设备管理', icon: 'zip', noCache: true }
-      }
-    ]
-  },
-  {
     path: '/alarm',
     component: Layout,
     redirect: '/alarm/alarm-rule',

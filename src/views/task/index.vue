@@ -13,6 +13,13 @@
               <el-input v-model="listQuery.taskNum" />
             </el-form-item>
           </el-col>
+          <el-col :span="8">
+            <el-form-item label="状态" prop="taskState">
+              <el-select v-model="listQuery.taskState" placeholder="请选择">
+                <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
         </el-row>
         <el-row type="flex" justify="end">
           <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="btnQuery()">查询</el-button>
@@ -40,16 +47,16 @@
       <el-table-column prop="endTime" label="结束时间" width="180" />
       <el-table-column label="操作">
         <template slot-scope="{row}">
-          <el-button type="primary" size="mini" @click="btnEdit(row)">
+          <el-button type="primary" size="mini" :disabled="row.taskStatus === 0?false:true" @click="btnEdit(row)">
             修改
           </el-button>
           <el-button type="primary" size="mini" @click="btnDel(row)">
             删除
           </el-button>
-          <el-button type="primary" size="mini" @click="btnChangeStatus(row,1)">
+          <el-button type="primary" size="mini" :disabled="row.taskStatus === 0?false:true" @click="btnChangeStatus(row,1)">
             开启
           </el-button>
-          <el-button type="primary" size="mini" @click="btnChangeStatus(row,2)">
+          <el-button type="primary" size="mini" :disabled="row.taskStatus === 1?false:true" @click="btnChangeStatus(row,2) ">
             结束
           </el-button>
         </template>
@@ -115,6 +122,19 @@ export default {
   },
   data() {
     return {
+      options: [{
+        value: '0',
+        label: '创建中'
+      }, {
+        value: '1',
+        label: '执行中'
+      }, {
+        value: '2',
+        label: '结束'
+      }, {
+        value: undefined,
+        label: '全选'
+      }],
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -128,14 +148,16 @@ export default {
       },
       listQuery: {
         taskName: undefined,
-        taskNum: undefined
+        taskNum: undefined,
+        taskState: undefined
       },
       tablePage: { total: 0, pageSize: 10, pageNumber: 1 },
       tableData: [],
       deviceList: []
     }
   },
-  created() {
+  mounted() {
+    this.listQuery.taskState = '1'
     this.btnQuery()
   },
   methods: {

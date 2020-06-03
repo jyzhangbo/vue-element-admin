@@ -8,8 +8,8 @@ export function listTask(data, tablePage) {
       taskName: data.taskName,
       taskNum: data.taskNum,
       pageNum: tablePage.pageNumber,
-      pageSize: tablePage.pageSize
-
+      pageSize: tablePage.pageSize,
+      taskState: data.taskState
     }
   })
 }

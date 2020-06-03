@@ -26,7 +26,7 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="设备编号:">
-                <task-device-select v-model="listTime.deviceNum" />
+                <el-cascader v-model="listTime.deviceNum" :options="options" placeholder="请选择" clearable />
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -150,13 +150,10 @@
 <script>
 import { queryData, queryTableData, simulationData, changeData, copyData } from '@/api/data/index'
 import echarts from 'echarts'
-import TaskDeviceSelect from '@/components/biz/TaskDeviceSelect'
+import { listTaskDevice } from '@/api/base/index'
 import moment from 'moment'
 
 export default {
-  components: {
-    TaskDeviceSelect
-  },
   data() {
     return {
       tableHeader: {},
@@ -185,9 +182,17 @@ export default {
     }
   },
   mounted() {
-    this.btnQuery()
+    this.getDeviceNum()
   },
   methods: {
+    getDeviceNum() {
+      listTaskDevice().then(resp => {
+        this.options = resp.data
+        this.listTime.deviceNum.push(resp.data[0].value)
+        this.listTime.deviceNum.push(resp.data[0].children[0].value)
+        this.queryDataTable()
+      })
+    },
     copyData() {
       copyData(this.copyDataInput, this.listTime).then(resp => {
         this.dialogFormVisible = false
@@ -226,7 +231,6 @@ export default {
     queryDataTable() {
       queryTableData(this.listTime, this.tablePage).then(resp => {
         this.tableData = resp.data.datas
-        this.listTime.deviceNum = resp.data.deviceNum
         this.tableHeader = resp.data.tableHeader
         this.listTemp = []
         for (var key in this.tableHeader) {
