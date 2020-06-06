@@ -193,8 +193,8 @@ export default {
           this.cardData.push(data1)
         }
         this.setOptionData(resp.data.xDatas, seriesData, legendData)
-        this.temp.deviceNum = resp.data.deviceNum[1]
-        this.temp.taskNum = resp.data.deviceNum[0]
+        this.temp.deviceNum = this.listTime.deviceNum[1]
+        this.temp.taskNum = this.listTime.deviceNum[0]
         this.temp.deviceName = resp.data.deviceName
         this.temp.attributeInfo = resp.data.attributeInfo
         this.temp.collectSpace = resp.data.collectSpace

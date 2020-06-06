@@ -44,7 +44,7 @@
     </div>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" :model="temp" :rules="rules" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
         <el-form-item label="设备编号" prop="deviceNum">
           <el-input v-model="temp.deviceNum" :disabled="dialogStatus==='create'?false:true" />
         </el-form-item>
@@ -72,6 +72,14 @@ export default {
   components: { CompanyNameSelect },
   data() {
     return {
+      rules: {
+        deviceNum: [
+          { required: true, message: '请输入设备编号', trigger: 'blur' }
+        ],
+        companyName: [
+          { required: true, message: '请选择厂家名称', trigger: 'change' }
+        ]
+      },
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -125,15 +133,29 @@ export default {
       }
     },
     createData() {
-      addDevice(this.temp).then(resp => {
-        this.btnQuery()
-        this.dialogFormVisible = false
+      this.$refs.dataForm.validate(valid => {
+        if (valid) {
+          addDevice(this.temp).then(resp => {
+            this.btnQuery()
+            this.dialogFormVisible = false
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
       })
     },
     updateData() {
-      editDeviceAdmin(this.temp).then(resp => {
-        this.btnQuery()
-        this.dialogFormVisible = false
+      this.$refs.dataForm.validate(valid => {
+        if (valid) {
+          editDeviceAdmin(this.temp).then(resp => {
+            this.btnQuery()
+            this.dialogFormVisible = false
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
       })
     }
   }
