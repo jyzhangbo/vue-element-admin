@@ -45,15 +45,17 @@
     </div>
 
     <el-dialog title="编辑" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="设备编号">
+      <el-form ref="dataForm" :model="temp" :rules="rules" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+        <el-form-item label="设备编号" prop="deviceNum">
           <el-input v-model="temp.deviceNum" disabled="" />
         </el-form-item>
-        <el-form-item label="设备名称">
+        <el-form-item label="设备名称" prop="deviceName">
           <el-input v-model="temp.deviceName" />
         </el-form-item>
-        <el-form-item label="采集频率">
-          <el-input v-model="temp.collectSpace" />
+        <el-form-item label="采集频率" prop="collectSpace">
+          <el-input v-model="temp.collectSpace">
+            <template slot="append">分钟</template>
+          </el-input>
         </el-form-item>
         <el-form-item v-for="item in temp.attributeInfo" :key="item.code" :label="item.code">
           <el-input v-model="item.name" />
@@ -97,6 +99,17 @@ export default {
   name: 'LineChart',
   data() {
     return {
+      rules: {
+        deviceNum: [
+          { required: true, message: '请输入设备编号', trigger: 'blur' }
+        ],
+        deviceName: [
+          { required: true, message: '请输入设备名称', trigger: 'blur' }
+        ],
+        collectSpace: [
+          { required: true, message: '请输入采集间隔', trigger: 'blur' }
+        ]
+      },
       options: [],
       cardData: [],
       time: '',
@@ -145,9 +158,16 @@ export default {
       })
     },
     updateData() {
-      editDeviceUser(this.temp).then(resp => {
-        this.btnQuery()
-        this.dialogFormVisible = false
+      this.$refs.dataForm.validate(valid => {
+        if (valid) {
+          editDeviceUser(this.temp).then(resp => {
+            this.btnQuery()
+            this.dialogFormVisible = false
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
       })
     },
     showPictures() {

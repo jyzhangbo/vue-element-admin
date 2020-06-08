@@ -2,30 +2,30 @@
   <div class="dashboard-editor-container">
     <div class="panel-group" style="background-color:white">
       <div>
-        <el-form ref="listTime" :model="listTime" label-width="130px">
+        <el-form ref="listTime" :model="listTime" :rules="rules" label-width="130px">
           <el-row :gutter="5">
             <el-col :span="6">
               <el-form-item label="起点:" prop="startTime">
-                <el-date-picker v-model="listTime.startTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
+                <el-date-picker :value="listTime.startTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="恒温点:" prop="stableTime">
-                <el-date-picker v-model="listTime.stableTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
+                <el-date-picker :value="listTime.stableTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="降温点:" prop="downTime">
-                <el-date-picker v-model="listTime.downTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
+                <el-date-picker :value="listTime.downTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="终点:" prop="endTime">
-                <el-date-picker v-model="listTime.endTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
+                <el-date-picker :value="listTime.endTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="设备编号:">
+              <el-form-item label="设备编号:" prop="deviceNum">
                 <el-cascader v-model="listTime.deviceNum" :options="options" placeholder="请选择" clearable />
               </el-form-item>
             </el-col>
@@ -155,7 +155,37 @@ import moment from 'moment'
 
 export default {
   data() {
+    // const validatorTime = (rule, value, callback) => {
+    //   if (value === '') {
+    //     callback(new Error('请输入时间'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
     return {
+      rules: {
+        startTime: [
+          { required: true, message: '请输入起点时间', trigger: 'change' }
+        ],
+        stableTime: [
+          { required: true, message: '请输入恒温点时间', trigger: 'change' }
+        ],
+        downTime: [
+          { required: true, message: '请输入降温点时间', trigger: 'change' }
+        ],
+        endTime: [
+          { required: true, message: '请输入终点点时间', trigger: 'change' }
+        ],
+        deviceNum: [
+          { type: 'array', required: true, message: '请输入设备编号', trigger: 'change' }
+        ],
+        timeSpace: [
+          { required: true, message: '请输入时间间隔', trigger: 'blur' }
+        ],
+        randomTime: [
+          { required: true, message: '请输入随机分钟', trigger: 'blur' }
+        ]
+      },
       tableHeader: {},
       dialogFormVisible: false,
       chart: null,
@@ -178,6 +208,7 @@ export default {
         addData: '',
         randomData: ''
       },
+      options: [],
       tablePage: { total: 0, pageSize: 10, pageNumber: 1 }
     }
   },
@@ -331,15 +362,21 @@ export default {
       })
     },
     simulationData() {
-      var temps = []
-      for (var i = 0; i < this.listTemp.length; i++) {
-        if (this.listTemp[i]['effective'] === true) {
-          temps.push(this.listTemp[i])
+      this.$refs.listTime.validate(valid => {
+        if (valid) {
+          var temps = []
+          for (var i = 0; i < this.listTemp.length; i++) {
+            if (this.listTemp[i]['effective'] === true) {
+              temps.push(this.listTemp[i])
+            }
+          }
+          simulationData(this.listTime, temps).then(resp => {
+            this.btnQuery()
+          })
+        } else {
+          console.log('error submit!!')
+          return false
         }
-      }
-
-      simulationData(this.listTime, temps).then(resp => {
-        this.btnQuery()
       })
     }
   }
