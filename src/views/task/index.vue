@@ -68,16 +68,16 @@
     </div>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :model="temp" :rules="rules" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" :model="temp" :rules="rules" label-position="left" label-width="100px" style="width: 50%; margin-left:50px;">
+        <el-form-item label="编号" prop="taskNum">
+          <el-input v-model="temp.taskNum" :disabled="dialogStatus==='create'?false:true" />
+        </el-form-item>
         <el-form-item label="名称" prop="taskName">
           <el-input v-model="temp.taskName" />
         </el-form-item>
-        <el-form-item label="编号" prop="taskNum">
-          <el-input v-model="temp.taskNum" />
-        </el-form-item>
         <el-form-item label="设备列表" prop="deviceNums">
           <el-checkbox-group v-model="temp.deviceNums">
-            <el-row>
+            <el-row :gutter="20">
               <el-col v-for="item in deviceList" :key="item.deviceNum" :span="12">
                 <el-checkbox :label="item.deviceNum">
                   {{ item.deviceName }}
@@ -128,9 +128,6 @@ export default {
         ],
         taskNum: [
           { required: true, message: '请输入编号', trigger: 'blur' }
-        ],
-        deviceNums: [
-          { type: 'array', required: true, message: '请选择设备', trigger: 'change' }
         ]
       },
       options: [{

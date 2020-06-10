@@ -61,15 +61,15 @@
       </div>
       <div v-show="!chartShow">
         <el-table :data="tableData" border stripe style="width: 100%">
-          <el-table-column type="index" label="序号" width="50" />
-          <el-table-column prop="time" label="时间" width="180" />
-          <el-table-column v-for="(value, key) in tableHeader" :key="key" :label="value" width="150">
+          <el-table-column type="index" label="序号" min-width="5%" />
+          <el-table-column prop="time" label="时间" min-width="10%" />
+          <el-table-column v-for="(value, key) in tableHeader" :key="key" :label="value" min-width="5%">
             <template slot-scope="scope">
               <el-input v-show="scope.row.show" v-model="scope.row.values[key]" placeholder="请输入内容" />
               <span v-show="!scope.row.show">{{ scope.row.values[key] }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="操作">
+          <el-table-column label="操作" min-width="20%">
             <template slot-scope="scope">
               <el-button @click="scope.row.show =true">编辑</el-button>
               <el-button @click="saveData(scope.row)">保存</el-button>

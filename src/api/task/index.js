@@ -31,7 +31,8 @@ export function editTask(data) {
     data: {
       taskNum: data.taskNum,
       devices: data.deviceNums,
-      state: data.state
+      state: data.state,
+      taskName: data.taskName
     }
   })
 }
