@@ -13,19 +13,6 @@ export function listDeviceAdmin(data, tablePage) {
   })
 }
 
-export function listDeviceUser(data, tablePage) {
-  return request({
-    url: '/device/list/user',
-    method: 'post',
-    data: {
-      deviceName: data.deviceName,
-      deviceNum: data.deviceNum,
-      pageNum: tablePage.pageNumber,
-      pageSize: tablePage.pageSize
-    }
-  })
-}
-
 export function addDevice(data) {
   return request({
     url: '/device/add',
@@ -67,7 +54,8 @@ export function editDeviceUser(data) {
       deviceNum: data.deviceNum,
       deviceName: data.deviceName,
       collectSpace: data.collectSpace,
-      attributeInfo: data.attributeInfo
+      attributeInfo: data.attributeInfo,
+      taskNum: data.taskNum
     }
   })
 }

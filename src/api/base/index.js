@@ -14,6 +14,7 @@ export function listTaskDevice(data) {
     url: '/base/list/task/device',
     method: 'post',
     data: {
+      taskState: data
     }
   })
 }

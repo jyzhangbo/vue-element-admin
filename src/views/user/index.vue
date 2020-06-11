@@ -5,7 +5,7 @@
         <el-row>
           <el-col :span="8">
             <el-form-item label="厂家名称" prop="companyName">
-              <el-input v-model="listQuery.companyName" />
+              <company-name-select v-model="listQuery.companyName" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -51,19 +51,19 @@
     </el-table>
 
     <div style="margin:auto;   width:60%">
-      <el-pagination layout="total, prev, pager, next, jumper" :page-size="tablePage.pageSize" :total="tablePage.total" @current-change="function(val){tablePage.pageNumber = val; renderTable();}" />
+      <el-pagination layout="total, prev, pager, next, jumper" :page-size="tablePage.pageSize" :total="tablePage.total" @current-change="function(val){tablePage.pageNumber = val; btnQuery();}" />
     </div>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" :model="temp" :rules="rules" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+        <el-form-item label="登录名" prop="loginName">
+          <el-input v-model="temp.loginName" :disabled="adminCheckBox" />
+        </el-form-item>
         <el-form-item label="厂家名称" prop="companyName">
-          <el-input v-model="temp.companyName" />
+          <el-input v-model="temp.companyName" :disabled="adminCheckBox" />
         </el-form-item>
         <el-form-item label="联系电话" prop="phone">
           <el-input v-model="temp.phone" />
-        </el-form-item>
-        <el-form-item label="登录名" prop="loginName">
-          <el-input v-model="temp.loginName" />
         </el-form-item>
         <el-form-item label="密码" prop="password">
           <el-input v-model="temp.password" />
@@ -86,7 +86,10 @@
 
 <script>
 import { listUser, deleteUser, addUser, editUser } from '@/api/user/index'
+import CompanyNameSelect from '@/components/biz/CompanyNameSelect'
+
 export default {
+  components: { CompanyNameSelect },
   filters: {
     userRoleFunc(val) {
       if (val === 'admin') {
@@ -100,6 +103,20 @@ export default {
   },
   data() {
     return {
+      rules: {
+        loginName: [
+          { required: true, message: '请输入登录名', trigger: 'blur' }
+        ],
+        companyName: [
+          { required: true, message: '请输入厂家名称', trigger: 'blur' }
+        ],
+        phone: [
+          { required: true, message: '请输入联系电话', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入登录密码', trigger: 'blur' }
+        ]
+      },
       adminCheckBox: false,
       dialogFormVisible: false,
       dialogStatus: '',
@@ -142,15 +159,29 @@ export default {
       })
     },
     createData() {
-      addUser(this.temp).then(resp => {
-        this.btnQuery()
-        this.dialogFormVisible = false
+      this.$refs.dataForm.validate(valid => {
+        if (valid) {
+          addUser(this.temp).then(resp => {
+            this.btnQuery()
+            this.dialogFormVisible = false
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
       })
     },
     updateData() {
-      editUser(this.temp).then(resp => {
-        this.btnQuery()
-        this.dialogFormVisible = false
+      this.$refs.dataForm.validate(valid => {
+        if (valid) {
+          editUser(this.temp).then(resp => {
+            this.btnQuery()
+            this.dialogFormVisible = false
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
       })
     },
     btnEdit(row) {

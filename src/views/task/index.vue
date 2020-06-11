@@ -13,6 +13,13 @@
               <el-input v-model="listQuery.taskNum" />
             </el-form-item>
           </el-col>
+          <el-col :span="8">
+            <el-form-item label="状态" prop="taskState">
+              <el-select v-model="listQuery.taskState" placeholder="请选择">
+                <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
         </el-row>
         <el-row type="flex" justify="end">
           <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="btnQuery()">查询</el-button>
@@ -40,16 +47,16 @@
       <el-table-column prop="endTime" label="结束时间" width="180" />
       <el-table-column label="操作">
         <template slot-scope="{row}">
-          <el-button type="primary" size="mini" @click="btnEdit(row)">
+          <el-button type="primary" size="mini" :disabled="row.taskStatus === 0?false:true" @click="btnEdit(row)">
             修改
           </el-button>
           <el-button type="primary" size="mini" @click="btnDel(row)">
             删除
           </el-button>
-          <el-button type="primary" size="mini" @click="btnChangeStatus(row,1)">
+          <el-button type="primary" size="mini" :disabled="row.taskStatus === 0?false:true" @click="btnChangeStatus(row,1)">
             开启
           </el-button>
-          <el-button type="primary" size="mini" @click="btnChangeStatus(row,2)">
+          <el-button type="primary" size="mini" :disabled="row.taskStatus === 1?false:true" @click="btnChangeStatus(row,2) ">
             结束
           </el-button>
         </template>
@@ -57,20 +64,20 @@
     </el-table>
 
     <div style="margin:auto;   width:60%">
-      <el-pagination layout="total, prev, pager, next, jumper" :page-size="tablePage.pageSize" :total="tablePage.total" @current-change="function(val){tablePage.pageNumber = val; renderTable();}" />
+      <el-pagination layout="total, prev, pager, next, jumper" :page-size="tablePage.pageSize" :total="tablePage.total" @current-change="function(val){tablePage.pageNumber = val; btnQuery();}" />
     </div>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" :model="temp" :rules="rules" label-position="left" label-width="100px" style="width: 50%; margin-left:50px;">
+        <el-form-item label="编号" prop="taskNum">
+          <el-input v-model="temp.taskNum" :disabled="dialogStatus==='create'?false:true" />
+        </el-form-item>
         <el-form-item label="名称" prop="taskName">
           <el-input v-model="temp.taskName" />
         </el-form-item>
-        <el-form-item label="编号" prop="taskNum">
-          <el-input v-model="temp.taskNum" />
-        </el-form-item>
-        <el-form-item label="设备列表" prop="devices">
+        <el-form-item label="设备列表" prop="deviceNums">
           <el-checkbox-group v-model="temp.deviceNums">
-            <el-row>
+            <el-row :gutter="20">
               <el-col v-for="item in deviceList" :key="item.deviceNum" :span="12">
                 <el-checkbox :label="item.deviceNum">
                   {{ item.deviceName }}
@@ -93,7 +100,7 @@
 </template>
 
 <script>
-import { listTask, listDeviceTask, editTask, addTask } from '@/api/task/index'
+import { listTask, listDeviceTask, editTask, addTask, deleteTask } from '@/api/task/index'
 export default {
   filters: {
     splitDevice(devices) {
@@ -115,6 +122,27 @@ export default {
   },
   data() {
     return {
+      rules: {
+        taskName: [
+          { required: true, message: '请输入名称', trigger: 'blur' }
+        ],
+        taskNum: [
+          { required: true, message: '请输入编号', trigger: 'blur' }
+        ]
+      },
+      options: [{
+        value: '0',
+        label: '创建中'
+      }, {
+        value: '1',
+        label: '执行中'
+      }, {
+        value: '2',
+        label: '结束'
+      }, {
+        value: undefined,
+        label: '全选'
+      }],
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -128,17 +156,24 @@ export default {
       },
       listQuery: {
         taskName: undefined,
-        taskNum: undefined
+        taskNum: undefined,
+        taskState: undefined
       },
       tablePage: { total: 0, pageSize: 10, pageNumber: 1 },
       tableData: [],
       deviceList: []
     }
   },
-  created() {
+  mounted() {
+    this.listQuery.taskState = '1'
     this.btnQuery()
   },
   methods: {
+    btnDel(row) {
+      deleteTask(row).then(resp => {
+        this.btnQuery()
+      })
+    },
     btnChangeStatus(row, status) {
       var deviceNums = []
       for (var i = 0; i < row.devices.length; i++) {
@@ -156,15 +191,29 @@ export default {
       })
     },
     updateData() {
-      editTask(this.temp).then(resp => {
-        this.btnQuery()
-        this.dialogFormVisible = false
+      this.$refs.dataForm.validate(valid => {
+        if (valid) {
+          editTask(this.temp).then(resp => {
+            this.btnQuery()
+            this.dialogFormVisible = false
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
       })
     },
     createData() {
-      addTask(this.temp).then(resp => {
-        this.btnQuery()
-        this.dialogFormVisible = false
+      this.$refs.dataForm.validate(valid => {
+        if (valid) {
+          addTask(this.temp).then(resp => {
+            this.btnQuery()
+            this.dialogFormVisible = false
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
       })
     },
     queryDeviceList(taskNum) {

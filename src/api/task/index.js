@@ -8,8 +8,8 @@ export function listTask(data, tablePage) {
       taskName: data.taskName,
       taskNum: data.taskNum,
       pageNum: tablePage.pageNumber,
-      pageSize: tablePage.pageSize
-
+      pageSize: tablePage.pageSize,
+      taskState: data.taskState
     }
   })
 }
@@ -31,7 +31,8 @@ export function editTask(data) {
     data: {
       taskNum: data.taskNum,
       devices: data.deviceNums,
-      state: data.state
+      state: data.state,
+      taskName: data.taskName
     }
   })
 }
@@ -44,6 +45,16 @@ export function addTask(data) {
       taskNum: data.taskNum,
       devices: data.deviceNums,
       taskName: data.taskName
+    }
+  })
+}
+
+export function deleteTask(data) {
+  return request({
+    url: '/task/delete',
+    method: 'post',
+    data: {
+      taskNum: data.taskNum
     }
   })
 }

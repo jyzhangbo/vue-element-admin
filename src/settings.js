@@ -1,5 +1,5 @@
 module.exports = {
-  title: '管理后台',
+  title: 'HLBR自动测温系统',
 
   /**
    * @type {boolean} true | false

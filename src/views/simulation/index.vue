@@ -2,48 +2,47 @@
   <div class="dashboard-editor-container">
     <div class="panel-group" style="background-color:white">
       <div>
-        <el-form ref="listTime" :model="listTime" label-width="130px">
+        <el-form ref="listTime" :model="listTime" :rules="rules" label-width="130px">
           <el-row :gutter="5">
             <el-col :span="6">
-              <el-form-item label="起点:" prop="alarmObject">
-                <el-date-picker v-model="listTime.startTime" type="datetime" placeholder="选择日期时间" />
+              <el-form-item label="起点:" prop="startTime">
+                <el-date-picker :value="listTime.startTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="恒温点:" prop="alarmTime">
-                <el-date-picker v-model="listTime.stableTime" type="datetime" placeholder="选择日期时间" />
+              <el-form-item label="恒温点:" prop="stableTime">
+                <el-date-picker :value="listTime.stableTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="降温点:" prop="alarmTime">
-                <el-date-picker v-model="listTime.downTime" type="datetime" placeholder="选择日期时间" />
+              <el-form-item label="降温点:" prop="downTime">
+                <el-date-picker :value="listTime.downTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="终点:" prop="alarmTime">
-                <el-date-picker v-model="listTime.endTime" type="datetime" placeholder="选择日期时间" />
+              <el-form-item label="终点:" prop="endTime">
+                <el-date-picker :value="listTime.endTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="设备编号:" prop="deviceNum">
-                <el-select v-model="listTime.deviceNum" placeholder="请选择">
-                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
+                <el-cascader v-model="listTime.deviceNum" :options="options" placeholder="请选择" clearable />
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="间隔:" prop="dataSpace">
-                <el-input v-model="listTemp.dataSpace" />
+              <el-form-item label="间隔(分钟):" prop="timeSpace">
+                <el-input v-model="listTime.timeSpace" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="随机分钟:" prop="randomTime">
-                <el-input v-model="listTemp.randomTime" />
+                <el-input v-model="listTime.randomTime" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
+              <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="btnQuery()">查询</el-button>
               <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="simulationData()">模拟数据</el-button>
-              <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="copyData()">复制数据</el-button>
+              <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="copyDataToDiglog()">复制数据</el-button>
             </el-col>
           </el-row>
         </el-form>
@@ -61,26 +60,25 @@
         <div id="mnsjChart" style="width:100%;height:400px;" />
       </div>
       <div v-show="!chartShow">
-        <el-table :data="tabledatas" border>
-          <el-table-column label="tab1">
+        <el-table :data="tableData" border stripe style="width: 100%">
+          <el-table-column type="index" label="序号" min-width="5%" />
+          <el-table-column prop="time" label="时间" min-width="10%" />
+          <el-table-column v-for="(value, key) in tableHeader" :key="key" :label="value" min-width="5%">
             <template slot-scope="scope">
-              <el-input v-show="scope.row.show" v-model="scope.row.tab1" placeholder="请输入内容" />
-              <span v-show="!scope.row.show">{{ scope.row.tab1 }}</span>
+              <el-input v-show="scope.row.show" v-model="scope.row.values[key]" placeholder="请输入内容" />
+              <span v-show="!scope.row.show">{{ scope.row.values[key] }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="tab2">
-            <template slot-scope="scope">
-              <el-input v-show="scope.row.show" v-model="scope.row.tab2" placeholder="请输入内容" />
-              <span v-show="!scope.row.show">{{ scope.row.tab2 }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作">
+          <el-table-column label="操作" min-width="20%">
             <template slot-scope="scope">
               <el-button @click="scope.row.show =true">编辑</el-button>
-              <el-button @click="scope.row.show =false">保存</el-button>
+              <el-button @click="saveData(scope.row)">保存</el-button>
             </template>
           </el-table-column>
         </el-table>
+        <div style="margin:auto;   width:60%">
+          <el-pagination layout="total, prev, pager, next, jumper" :page-size="tablePage.pageSize" :total="tablePage.total" @current-change="function(val){tablePage.pageNumber = val; queryDataTable();}" />
+        </div>
       </div>
       <div>
         <el-row :gutter="5">
@@ -116,33 +114,33 @@
     </div>
     <el-dialog title="数据复制" :visible.sync="dialogFormVisible">
       <el-row :gutter="10">
-        <el-col span="8">
+        <el-col :span="8">
           <el-card class="box-card" style="border-radius: 20px">
-            <el-select v-model="listTime.deviceNum" placeholder="请选择">
-              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+            <el-select v-model="copyDataInput.fromAttr" placeholder="请选择">
+              <el-option v-for="(value, key) in tableHeader" :key="key" :label="key" :value="key">{{ value }}</el-option>
             </el-select>
           </el-card>
         </el-col>
-        <el-col span="8">
+        <el-col :span="8">
           <el-card class="box-card" style="border-radius: 20px">
             <el-input v-model="copyDataInput.addData" placeholder="固定增加数" clearable />
             <el-input v-model="copyDataInput.randomData" placeholder="随机变动数" clearable />
           </el-card>
         </el-col>
-        <el-col span="8">
+        <el-col :span="8">
           <el-card class="box-card" style="border-radius: 20px">
-            <el-checkbox-group v-model="checkedCities">
-              <el-checkbox v-for="city in cities" :key="city" :label="city">{{ city }}</el-checkbox>
+            <el-checkbox-group v-model="copyDataInput.toAttr">
+              <el-checkbox v-for="(value, key) in tableHeader" :key="key" :label="key">{{ value }}</el-checkbox>
             </el-checkbox-group>
           </el-card>
         </el-col>
       </el-row>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
-          Cancel
+          取消
         </el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          Confirm
+        <el-button type="primary" @click="copyData()">
+          确认
         </el-button>
       </div>
     </el-dialog>
@@ -150,79 +148,162 @@
 </template>
 
 <script>
-import { simulationData } from '@/api/simulation/index'
-import { queryData } from '@/api/data/index'
+import { queryData, queryTableData, simulationData, changeData, copyData } from '@/api/data/index'
 import echarts from 'echarts'
-import resize from '@/components/Charts/mixins/resize'
+import { listTaskDevice } from '@/api/base/index'
+import moment from 'moment'
 
 export default {
-  name: 'LineChart',
-  mixins: [resize],
   data() {
+    // const validatorTime = (rule, value, callback) => {
+    //   if (value === '') {
+    //     callback(new Error('请输入时间'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
     return {
+      rules: {
+        startTime: [
+          { required: true, message: '请输入起点时间', trigger: 'change' }
+        ],
+        stableTime: [
+          { required: true, message: '请输入恒温点时间', trigger: 'change' }
+        ],
+        downTime: [
+          { required: true, message: '请输入降温点时间', trigger: 'change' }
+        ],
+        endTime: [
+          { required: true, message: '请输入终点点时间', trigger: 'change' }
+        ],
+        deviceNum: [
+          { type: 'array', required: true, message: '请输入设备编号', trigger: 'change' }
+        ],
+        timeSpace: [
+          { required: true, message: '请输入时间间隔', trigger: 'blur' }
+        ],
+        randomTime: [
+          { required: true, message: '请输入随机分钟', trigger: 'blur' }
+        ]
+      },
+      tableHeader: {},
       dialogFormVisible: false,
+      chart: null,
+      tableData: [],
+      chartShow: false,
+      listTime: {
+        startTime: moment().format('yyyy-MM-DD 00:00:00'),
+        stableTime: '',
+        downTime: '',
+        endTime: '',
+        deviceNum: [],
+        timeSpace: '',
+        randomTime: ''
+
+      },
+      listTemp: [],
       copyDataInput: {
+        fromAttr: '',
+        toAttr: [],
         addData: '',
         randomData: ''
       },
-      listTime: {
-        startTime: '',
-        stableTime: '',
-        downTime: '',
-        endTime: ''
-      },
-      listTemp: [{
-        startTemp: '',
-        stableTemp: '',
-        downTemp: '',
-        endTemp: '',
-        randomData: '',
-        deviceNum: '',
-        effective: true,
-        name: 'T1'
-      },
-      {
-        startTemp: '',
-        stableTemp: '',
-        downTemp: '',
-        endTemp: '',
-        randomData: '',
-        deviceNum: '',
-        effective: true,
-        name: 'T2'
-      }],
-      options: [{
-        value: '选项1',
-        label: '黄金糕'
-      }],
-      chart: null,
-      tabledatas: [
-        { tab1: '111', tab2: '2222', show: true },
-        { tab1: 'aaa', tab2: 'bbb', show: false }
-      ],
-      chartShow: false,
-      checkedCities: ['上海', '北京'],
-      cities: ['上海', '北京', '广州', '深圳']
+      options: [],
+      tablePage: { total: 0, pageSize: 10, pageNumber: 1 }
     }
   },
+  mounted() {
+    this.getDeviceNum()
+  },
   methods: {
+    getDeviceNum() {
+      listTaskDevice().then(resp => {
+        this.options = resp.data
+        this.listTime.deviceNum.push(resp.data[0].value)
+        this.listTime.deviceNum.push(resp.data[0].children[0].value)
+        this.queryDataTable()
+      })
+    },
     copyData() {
+      copyData(this.copyDataInput, this.listTime).then(resp => {
+        this.dialogFormVisible = false
+        this.btnQuery()
+        this.copyDataInput = {
+          fromAttr: '',
+          toAttr: [],
+          addData: '',
+          randomData: ''
+        }
+      })
+    },
+    copyDataToDiglog() {
       this.dialogFormVisible = true
+    },
+    saveData(row) {
+      row.show = false
+      changeData(row, this.listTime)
     },
     changeShow() {
       if (this.chartShow === true) {
         this.chartShow = false
+        this.queryDataTable()
       } else {
         this.chartShow = true
         this.initChart()
       }
+    },
+    btnQuery() {
+      if (this.chartShow === false) {
+        this.queryDataTable()
+      } else {
+        this.queryDataChart()
+      }
+    },
+    queryDataTable() {
+      queryTableData(this.listTime, this.tablePage).then(resp => {
+        this.tableData = resp.data.datas
+        this.tableHeader = resp.data.tableHeader
+        this.listTemp = []
+        for (var key in this.tableHeader) {
+          var tempData = {
+            name: this.tableHeader[key],
+            code: key,
+            startTemp: '',
+            stableTemp: '',
+            downTemp: '',
+            endTemp: '',
+            randomData: '',
+            effective: true
+          }
+          this.listTemp.push(tempData)
+        }
+        this.tablePage.total = resp.data.total
+      })
     },
     initChart() {
       var contain = document.getElementById('mnsjChart')
       contain.style.width = window.innerWidth - 300 + 'px'
       contain.style.height = '300px'
       this.chart = echarts.init(contain)
+      this.queryDataChart()
+    },
+    queryDataChart() {
       queryData(this.listTime).then(resp => {
+        this.tableHeader = resp.data.tableHeader
+        this.listTemp = []
+        for (var key in this.tableHeader) {
+          var tempData = {
+            name: this.tableHeader[key],
+            code: key,
+            startTemp: '',
+            stableTemp: '',
+            downTemp: '',
+            endTemp: '',
+            randomData: '',
+            effective: true
+          }
+          this.listTemp.push(tempData)
+        }
         var seriesData = []
         var legendData = []
         for (const item of resp.data.yDatas) {
@@ -281,19 +362,21 @@ export default {
       })
     },
     simulationData() {
-      simulationData(this.listTime, this.listTemp).then(resp => {
-        var seriesData = []
-        var legendData = []
-        for (const item of resp.data.yDatas) {
-          var data = {
-            name: item.name,
-            type: 'line',
-            data: item.values
+      this.$refs.listTime.validate(valid => {
+        if (valid) {
+          var temps = []
+          for (var i = 0; i < this.listTemp.length; i++) {
+            if (this.listTemp[i]['effective'] === true) {
+              temps.push(this.listTemp[i])
+            }
           }
-          seriesData.push(data)
-          legendData.push(item.name)
+          simulationData(this.listTime, temps).then(resp => {
+            this.btnQuery()
+          })
+        } else {
+          console.log('error submit!!')
+          return false
         }
-        this.setOptionData(resp.data.xDatas, seriesData, legendData)
       })
     }
   }

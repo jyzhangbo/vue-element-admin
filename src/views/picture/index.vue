@@ -2,14 +2,15 @@
   <div class="dashboard-editor-container">
     <div class="panel-group" style="background-color:white">
       <el-upload
-        action="http://localhost:8080/file/upload"
+        action="https://hlbr.smartdeviceclub.com/file/upload"
         name="upfile"
         :on-preview="handlePreview"
         :on-remove="handleRemove"
+        :on-success="handleSuccess"
         :file-list="fileList"
         list-type="picture-card"
       >
-        <!-- <i class="el-icon-plus" /> -->
+        <i class="el-icon-plus" />
       </el-upload>
       <el-dialog :visible.sync="dialogVisible">
         <img width="100%" :src="dialogImageUrl" alt="">
@@ -19,25 +20,33 @@
 </template>
 
 <script>
-
+import { listImg, removeImg } from '@/api/picture/index'
 export default {
   data() {
     return {
       fileList: [
-        { name: 'food.jpeg',
-          url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
-        },
-        { name: 'food2.jpeg',
-          url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
-        }
       ],
       dialogImageUrl: '',
-      dialogVisible: false
+      dialogVisible: false,
+      uploadUrl: ''
     }
   },
+  created() {
+    this.queryImgs()
+  },
   methods: {
+    queryImgs() {
+      listImg().then(resp => {
+        this.fileList = resp.data
+      })
+    },
+    handleSuccess(response, file, fileList) {
+      this.queryImgs()
+    },
     handleRemove(file, fileList) {
       console.log(file, fileList)
+      removeImg(file.url).then(resp => {
+      })
     },
     handlePreview(file) {
       this.dialogImageUrl = file.url

@@ -13,12 +13,17 @@ export default {
       default: function() {
         []
       }
+    },
+    taskstate: {
+      type: String,
+      default: undefined
     }
   },
   data() {
     return {
       svalue: this.value,
-      options: []
+      options: [],
+      taskStateIn: this.taskstate
     }
   },
   watch: {
@@ -31,13 +36,15 @@ export default {
       }
     }
   },
-  mounted() {
+  created() {
     this.renderCompanyName()
   },
   methods: {
     renderCompanyName() {
-      listTaskDevice().then(resp => {
+      listTaskDevice(this.taskStateIn).then(resp => {
         this.options = resp.data
+        this.svalue.push(resp.data[0].value)
+        this.svalue.push(resp.data[0].children[0].value)
       })
     }
   }
