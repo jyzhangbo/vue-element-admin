@@ -2,15 +2,15 @@
   <div class="dashboard-editor-container">
     <div class="panel-group" style="background-color:white">
       <div>
-        <el-form ref="listTime" :model="listTime" label-width="130px">
+        <el-form ref="listTime" :model="listTime" :rules="rulesQuery" label-width="130px">
           <el-row :gutter="20">
             <el-col :span="6">
-              <el-form-item label="起点:" prop="alarmObject">
+              <el-form-item label="起点:" prop="startTime">
                 <el-date-picker v-model="listTime.startTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="设备编号:">
+              <el-form-item label="设备编号:" prop="deviceNum">
                 <el-cascader v-model="listTime.deviceNum" :options="options" placeholder="请选择" clearable />
               </el-form-item>
             </el-col>
@@ -110,6 +110,14 @@ export default {
           { required: true, message: '请输入采集间隔', trigger: 'blur' }
         ]
       },
+      rulesQuery: {
+        startTime: [
+          { required: true, message: '请输入起点时间', trigger: 'change' }
+        ],
+        deviceNum: [
+          { type: 'array', required: true, message: '请输入设备编号', trigger: 'change' }
+        ]
+      },
       options: [],
       cardData: [],
       time: '',
@@ -185,7 +193,14 @@ export default {
       this.dialogPictureVisible = false
     },
     btnModify() {
-      this.dialogFormVisible = true
+      this.$refs.listTime.validate(valid => {
+        if (valid) {
+          this.dialogFormVisible = true
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
     },
     initChart() {
       var contain = document.getElementById('mnsjChart')
@@ -194,32 +209,39 @@ export default {
       this.btnQuery()
     },
     btnQuery() {
-      queryData(this.listTime).then(resp => {
-        var seriesData = []
-        var legendData = []
-        this.cardData = []
-        for (const item of resp.data.yDatas) {
-          var data = {
-            name: item.name,
-            type: 'line',
-            data: item.values
-          }
-          seriesData.push(data)
-          legendData.push(item.name)
-          var data1 = {
-            name: item.name,
-            realtimevalue: item.values[item.values.length - 1]
-          }
-          this.cardData.push(data1)
+      this.$refs.listTime.validate(valid => {
+        if (valid) {
+          queryData(this.listTime).then(resp => {
+            var seriesData = []
+            var legendData = []
+            this.cardData = []
+            for (const item of resp.data.yDatas) {
+              var data = {
+                name: item.name,
+                type: 'line',
+                data: item.values
+              }
+              seriesData.push(data)
+              legendData.push(item.name)
+              var data1 = {
+                name: item.name,
+                realtimevalue: item.values[item.values.length - 1]
+              }
+              this.cardData.push(data1)
+            }
+            this.setOptionData(resp.data.xDatas, seriesData, legendData)
+            this.temp.deviceNum = this.listTime.deviceNum[1]
+            this.temp.taskNum = this.listTime.deviceNum[0]
+            this.temp.deviceName = resp.data.deviceName
+            this.temp.attributeInfo = resp.data.attributeInfo
+            this.temp.collectSpace = resp.data.collectSpace
+            this.temp.img = resp.data.deviceImg
+            this.time = resp.data.xDatas[resp.data.xDatas.length - 1]
+          })
+        } else {
+          console.log('error submit!!')
+          return false
         }
-        this.setOptionData(resp.data.xDatas, seriesData, legendData)
-        this.temp.deviceNum = this.listTime.deviceNum[1]
-        this.temp.taskNum = this.listTime.deviceNum[0]
-        this.temp.deviceName = resp.data.deviceName
-        this.temp.attributeInfo = resp.data.attributeInfo
-        this.temp.collectSpace = resp.data.collectSpace
-        this.temp.img = resp.data.deviceImg
-        this.time = resp.data.xDatas[resp.data.xDatas.length - 1]
       })
     },
     setOptionData(xDatas, seriesData, legendData) {

@@ -2,20 +2,20 @@
   <div class="dashboard-editor-container">
     <div class="panel-group" style="background-color:white">
       <div>
-        <el-form ref="listTime" :model="listTime" label-width="130px">
+        <el-form ref="listTime" :model="listTime" :rules="rules" label-width="130px">
           <el-row :gutter="20">
             <el-col :span="6">
-              <el-form-item label="起点:" prop="alarmObject">
+              <el-form-item label="起点:" prop="startTime">
                 <el-date-picker v-model="listTime.startTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="终点:" prop="alarmTime">
+              <el-form-item label="终点:" prop="endTime">
                 <el-date-picker v-model="listTime.endTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="设备编号:">
+              <el-form-item label="设备编号:" prop="deviceNum">
                 <el-cascader v-model="listTime.deviceNum" :options="options" placeholder="请选择" clearable />
               </el-form-item>
             </el-col>
@@ -23,7 +23,7 @@
           <el-row type="flex" justify="end">
             <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="btnQuery()">查询</el-button>
             <el-button type="info" icon="el-icon-magic-stick" @click="resetQuery('listQuery')">重置</el-button>
-            <el-button type="success" style="background-color: #42b983;" icon="el-icon-download">导出</el-button>
+            <el-button type="success" style="background-color: #42b983;" icon="el-icon-download" @click="exportTableData">导出</el-button>
           </el-row>
         </el-form>
       </div>
@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { queryData, queryTableData } from '@/api/data/index'
+import { queryData, queryTableData, exportExcel } from '@/api/data/index'
 import echarts from 'echarts'
 import moment from 'moment'
 import { listTaskDevice } from '@/api/base/index'
@@ -70,6 +70,14 @@ export default {
   name: 'LineChart',
   data() {
     return {
+      rules: {
+        startTime: [
+          { required: true, message: '请输入起点时间', trigger: 'change' }
+        ],
+        deviceNum: [
+          { type: 'array', required: true, message: '请输入设备编号', trigger: 'change' }
+        ]
+      },
       tableHeader: {},
       chartShow: false,
       listTime: {
@@ -88,6 +96,22 @@ export default {
     this.getDeviceNum()
   },
   methods: {
+    exportTableData() {
+      this.$refs.listTime.validate(valid => {
+        if (valid) {
+          this.$confirm('是否导出excel?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'success'
+          }).then(() => {
+            exportExcel(this.listTime)
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
     getDeviceNum() {
       listTaskDevice().then(resp => {
         this.options = resp.data
@@ -124,25 +148,32 @@ export default {
       })
     },
     btnQuery() {
-      if (this.chartShow === false) {
-        this.queryDataTable()
-      } else {
-        queryData(this.listTime).then(resp => {
-          var seriesData = []
-          var legendData = []
-          for (const item of resp.data.yDatas) {
-            var data = {
-              name: item.name,
-              type: 'line',
-              data: item.values
-            }
-            seriesData.push(data)
-            legendData.push(item.name)
+      this.$refs.listTime.validate(valid => {
+        if (valid) {
+          if (this.chartShow === false) {
+            this.queryDataTable()
+          } else {
+            queryData(this.listTime).then(resp => {
+              var seriesData = []
+              var legendData = []
+              for (const item of resp.data.yDatas) {
+                var data = {
+                  name: item.name,
+                  type: 'line',
+                  data: item.values
+                }
+                seriesData.push(data)
+                legendData.push(item.name)
+              }
+              this.setOptionData(resp.data.xDatas, seriesData, legendData)
+              this.deviceImg = resp.data.deviceImg
+            })
           }
-          this.setOptionData(resp.data.xDatas, seriesData, legendData)
-          this.deviceImg = resp.data.deviceImg
-        })
-      }
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
     },
     setOptionData(xDatas, seriesData, legendData) {
       this.chart.setOption({

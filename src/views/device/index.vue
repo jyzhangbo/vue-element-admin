@@ -18,7 +18,7 @@
           <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="btnQuery()">查询</el-button>
           <el-button type="info" icon="el-icon-magic-stick" @click="resetQuery('listQuery')">重置</el-button>
           <el-button style="background-color: #42b983;" type="success" icon="el-icon-edit" @click="btnCreate()">新增</el-button>
-          <el-button style="background-color: #42b983;" type="success" icon="el-icon-edit" @click="btnCreate()">导入</el-button>
+          <!-- <el-button style="background-color: #42b983;" type="success" icon="el-icon-edit" @click="btnCreate()">导入</el-button> -->
         </el-row>
       </el-form>
     </div>

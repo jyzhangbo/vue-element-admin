@@ -5,9 +5,6 @@ export function getAlarmRuleList(data) {
     url: '/alarm/rule/list',
     method: 'post',
     data: {
-      alarmObject: data.alarmObject,
-      isEnable: data.state,
-      companyName: 'ziru'
     }
   })
 }
@@ -18,8 +15,7 @@ export function enableAlarmRule(data) {
     method: 'post',
     data: {
       id: data.id,
-      isEnable: data.isEnable,
-      companyName: 'ziru'
+      isEnable: data.isEnable
     }
   })
 }
@@ -43,7 +39,6 @@ export function getAlarmLogList(data, tablePage) {
       alarmObject: data.alarmObject,
       alarmStartTime: data.alarmTime[0],
       alarmEndTime: data.alarmTime[1],
-      companyName: 'ziru',
       pageNumber: tablePage.pageNumber,
       pageSize: tablePage.pageSize
     }

@@ -75,3 +75,13 @@ export function copyData(data, listTime) {
     }
   })
 }
+
+export function exportExcel(query) {
+  const data = {
+    startTime: query.startTime,
+    endTime: query.endTime,
+    taskNum: query.deviceNum[0],
+    deviceNum: query.deviceNum[1]
+  }
+  window.location.href = 'https://localhost:8080/data/export/excel?param=' + encodeURIComponent(JSON.stringify(data), 'utf-8')
+}

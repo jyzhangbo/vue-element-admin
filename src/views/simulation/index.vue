@@ -155,13 +155,6 @@ import moment from 'moment'
 
 export default {
   data() {
-    // const validatorTime = (rule, value, callback) => {
-    //   if (value === '') {
-    //     callback(new Error('请输入时间'))
-    //   } else {
-    //     callback()
-    //   }
-    // }
     return {
       rules: {
         startTime: [
@@ -174,7 +167,7 @@ export default {
           { required: true, message: '请输入降温点时间', trigger: 'change' }
         ],
         endTime: [
-          { required: true, message: '请输入终点点时间', trigger: 'change' }
+          { required: true, message: '请输入终点时间', trigger: 'change' }
         ],
         deviceNum: [
           { type: 'array', required: true, message: '请输入设备编号', trigger: 'change' }
