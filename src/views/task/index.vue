@@ -4,13 +4,13 @@
       <el-form ref="listQuery" :model="listQuery" label-width="130px" style="padding-top:10px;">
         <el-row>
           <el-col :span="8">
-            <el-form-item label="名称" prop="taskName">
-              <el-input v-model="listQuery.taskName" />
+            <el-form-item label="梁号" prop="taskNum">
+              <el-input v-model="listQuery.taskNum" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="编号" prop="taskNum">
-              <el-input v-model="listQuery.taskNum" />
+            <el-form-item label="台座号" prop="taskName">
+              <el-input v-model="listQuery.taskName" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -31,9 +31,9 @@
 
     <el-table :data="tableData" border stripe style="width: 100%">
       <el-table-column type="index" label="序号" width="50" />
-      <el-table-column prop="taskName" label="名称" width="180" />
-      <el-table-column prop="taskNum" label="编号" width="180" />
-      <el-table-column prop="taskStatus" label="状态" width="90">
+      <el-table-column prop="taskNum" label="梁号" width="80" />
+      <el-table-column prop="taskName" label="台座号" width="80" />
+      <el-table-column prop="taskStatus" label="状态" width="80">
         <template slot-scope="scope">
           {{ scope.row.taskStatus|taskStatusFunc }}
         </template>
@@ -43,8 +43,8 @@
           {{ scope.row.devices|splitDevice }}
         </template>
       </el-table-column>
-      <el-table-column prop="startTime" label="开始时间" width="180" />
-      <el-table-column prop="endTime" label="结束时间" width="180" />
+      <el-table-column prop="startTime" label="开始时间" width="170" />
+      <el-table-column prop="endTime" label="结束时间" width="170" />
       <el-table-column label="操作">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" :disabled="row.taskStatus === 0?false:true" @click="btnEdit(row)">
@@ -69,10 +69,10 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :model="temp" :rules="rules" label-position="left" label-width="100px" style="width: 50%; margin-left:50px;">
-        <el-form-item label="编号" prop="taskNum">
+        <el-form-item label="梁号" prop="taskNum">
           <el-input v-model="temp.taskNum" :disabled="dialogStatus==='create'?false:true" />
         </el-form-item>
-        <el-form-item label="名称" prop="taskName">
+        <el-form-item label="台座号" prop="taskName">
           <el-input v-model="temp.taskName" />
         </el-form-item>
         <el-form-item label="设备列表" prop="deviceNums">
@@ -106,7 +106,7 @@ export default {
     splitDevice(devices) {
       var val = []
       for (var i = 0; i < devices.length; i++) {
-        val.push(devices[i].deviceNum)
+        val.push(devices[i].deviceName)
       }
       return val.join(';')
     },

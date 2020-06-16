@@ -2,31 +2,31 @@
   <div class="dashboard-editor-container">
     <div class="panel-group" style="background-color:white">
       <div>
-        <el-form ref="listTime" :model="listTime" :rules="rules" label-width="130px">
-          <el-row :gutter="5">
-            <el-col :span="6">
+        <el-form ref="listTime" :model="listTime" :rules="rules" label-width="auto">
+          <el-row :gutter="20">
+            <el-col :span="8">
               <el-form-item label="起点:" prop="startTime">
-                <el-date-picker :value="listTime.startTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
+                <el-date-picker v-model="listTime.startTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="8">
               <el-form-item label="恒温点:" prop="stableTime">
-                <el-date-picker :value="listTime.stableTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
+                <el-date-picker v-model="listTime.stableTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="8">
               <el-form-item label="降温点:" prop="downTime">
-                <el-date-picker :value="listTime.downTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
+                <el-date-picker v-model="listTime.downTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="12">
               <el-form-item label="终点:" prop="endTime">
-                <el-date-picker :value="listTime.endTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
+                <el-date-picker v-model="listTime.endTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="12">
               <el-form-item label="设备编号:" prop="deviceNum">
-                <el-cascader v-model="listTime.deviceNum" :options="options" placeholder="请选择" clearable />
+                <el-cascader v-model="listTime.deviceNum" :options="options" style="width: 300px" placeholder="请选择" clearable />
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -39,7 +39,7 @@
                 <el-input v-model="listTime.randomTime" />
               </el-form-item>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="12">
               <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="btnQuery()">查询</el-button>
               <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="simulationData()">模拟数据</el-button>
               <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="copyDataToDiglog()">复制数据</el-button>

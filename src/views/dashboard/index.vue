@@ -2,16 +2,16 @@
   <div class="dashboard-editor-container">
     <div class="panel-group" style="background-color:white">
       <div>
-        <el-form ref="listTime" :model="listTime" :rules="rulesQuery" label-width="130px">
-          <el-row :gutter="20">
-            <el-col :span="6">
+        <el-form ref="listTime" :model="listTime" :rules="rulesQuery" label-width="90px">
+          <el-row :gutter="10">
+            <el-col :span="7">
               <el-form-item label="起点:" prop="startTime">
                 <el-date-picker v-model="listTime.startTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
               </el-form-item>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="9">
               <el-form-item label="设备编号:" prop="deviceNum">
-                <el-cascader v-model="listTime.deviceNum" :options="options" placeholder="请选择" clearable />
+                <el-cascader v-model="listTime.deviceNum" :options="options" style="width: 300px" placeholder="请选择" clearable />
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -22,7 +22,7 @@
         </el-form>
       </div>
     </div>
-    <div class="panel-group" style="background-color:white;">
+    <div class="panel-group" style="background-color:white;text-align:center">
       <el-image style="width: 200px; height: 200px" :src="temp.img" />
     </div>
     <div class="panel-group" style="background-color:white">
