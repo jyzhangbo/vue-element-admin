@@ -83,5 +83,5 @@ export function exportExcel(query) {
     taskNum: query.deviceNum[0],
     deviceNum: query.deviceNum[1]
   }
-  window.location.href = 'https://localhost:8080/data/export/excel?param=' + encodeURIComponent(JSON.stringify(data), 'utf-8')
+  window.location.href = '/data/export/excel?param=' + encodeURIComponent(JSON.stringify(data), 'utf-8')
 }
