@@ -86,7 +86,7 @@ export const constantRoutes = [
         path: 'index',
         component: () => import('@/views/task/index'),
         name: '任务管理',
-        meta: { title: '任务管理', icon: 'user', noCache: true }
+        meta: { title: '任务管理', icon: 'task', noCache: true }
       }
     ]
   },
@@ -99,7 +99,7 @@ export const constantRoutes = [
         path: 'index',
         component: () => import('@/views/data/index'),
         name: '数据查询',
-        meta: { title: '数据查询', icon: 'user', noCache: true }
+        meta: { title: '数据查询', icon: 'data', noCache: true }
       }
     ]
   },
@@ -111,20 +111,20 @@ export const constantRoutes = [
     alwaysShow: true,
     meta: {
       title: '告警管理',
-      icon: 'example'
+      icon: 'alarm'
     },
     children: [
       {
         path: 'alarm-rule',
         component: () => import('@/views/alarm/alarm-rule'),
         name: '告警规则',
-        meta: { title: '告警规则', icon: 'edit', noCache: true }
+        meta: { title: '告警规则', icon: 'alarm', noCache: true }
       },
       {
         path: 'alarm-list',
         component: () => import('@/views/alarm/alarm-list'),
         name: '告警列表',
-        meta: { title: '告警列表', icon: 'edit', noCache: true }
+        meta: { title: '告警列表', icon: 'alarm', noCache: true }
       }
     ]
   }
@@ -164,7 +164,7 @@ export const asyncRoutes = [
         name: '图片管理',
         meta: {
           title: '图片管理',
-          icon: 'user',
+          icon: 'picture',
           noCache: true,
           roles: ['admin']
         }
@@ -200,7 +200,7 @@ export const asyncRoutes = [
         name: '设备录入',
         meta: {
           title: '设备录入',
-          icon: 'zip',
+          icon: 'device',
           noCache: true,
           roles: ['admin']
         }

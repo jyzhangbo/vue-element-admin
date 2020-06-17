@@ -2,11 +2,12 @@
   <div class="dashboard-editor-container">
     <div class="panel-group" style="background-color:white">
       <el-upload
-        action="https://hlbr.smartdeviceclub.com/file/upload"
+        action="/file/upload"
         name="upfile"
         :on-preview="handlePreview"
         :on-remove="handleRemove"
         :on-success="handleSuccess"
+        :data="userName"
         :file-list="fileList"
         list-type="picture-card"
       >
@@ -21,6 +22,8 @@
 
 <script>
 import { listImg, removeImg } from '@/api/picture/index'
+import { getToken } from '@/utils/auth'
+
 export default {
   data() {
     return {
@@ -28,11 +31,15 @@ export default {
       ],
       dialogImageUrl: '',
       dialogVisible: false,
-      uploadUrl: ''
+      uploadUrl: '',
+      userName: {}
     }
   },
   created() {
     this.queryImgs()
+    this.userName = {
+      token: getToken()
+    }
   },
   methods: {
     queryImgs() {

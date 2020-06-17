@@ -16,7 +16,7 @@
             </el-col>
             <el-col :span="10">
               <el-form-item label="设备编号:" prop="deviceNum">
-                <el-cascader v-model="listTime.deviceNum" :options="options" style="width: 300px" placeholder="请选择" clearable />
+                <el-cascader v-model="listTime.deviceNum" :options="options" style="width: 300px" placeholder="请选择" filterable clearable />
               </el-form-item>
             </el-col>
           </el-row>
