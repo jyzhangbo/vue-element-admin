@@ -63,7 +63,6 @@
         <el-form-item label="设备图片">
           <el-image
             style="width: 100px; height: 100px"
-            lazy="true"
             :src="temp.img"
             :preview-src-list="srcList"
           />
@@ -136,7 +135,7 @@ export default {
         deviceNum: undefined,
         deviceName: undefined,
         attributeInfo: undefined,
-        img: undefined,
+        img: 'https://hlbr.smartdeviceclub.com/home/img/d7dcd2deb11840af8b40cd93f800b116.png',
         collectSpace: undefined,
         taskNum: undefined
 
