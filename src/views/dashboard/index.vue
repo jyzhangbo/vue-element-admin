@@ -63,6 +63,7 @@
         <el-form-item label="设备图片">
           <el-image
             style="width: 100px; height: 100px"
+            lazy="true"
             :src="temp.img"
             :preview-src-list="srcList"
           />
