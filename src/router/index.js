@@ -166,7 +166,7 @@ export const asyncRoutes = [
           title: '图片管理',
           icon: 'picture',
           noCache: true,
-          roles: ['admin']
+          roles: ['userAdmin']
         }
       }
     ]
@@ -182,7 +182,25 @@ export const asyncRoutes = [
         name: '数据模拟',
         meta: {
           title: '数据模拟',
-          icon: 'user',
+          icon: 'simulation',
+          noCache: true,
+          roles: ['userAdmin']
+        }
+      }
+    ]
+  },
+  {
+    path: '/control',
+    component: Layout,
+    redirect: '/control/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/control/index'),
+        name: '温度控制',
+        meta: {
+          title: '温度控制',
+          icon: 'control',
           noCache: true,
           roles: ['userAdmin']
         }
