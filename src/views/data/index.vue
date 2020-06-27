@@ -4,26 +4,15 @@
       <div>
         <el-form ref="listTime" :model="listTime" :rules="rules" label-width="auto">
           <el-row :gutter="10">
-            <el-col :span="7">
-              <el-form-item label="起点:" prop="startTime">
-                <el-date-picker v-model="listTime.startTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="7">
-              <el-form-item label="终点:" prop="endTime">
-                <el-date-picker v-model="listTime.endTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="10">
+            <el-col :span="12">
               <el-form-item label="设备编号:" prop="deviceNum">
-                <el-cascader v-model="listTime.deviceNum" :options="options" style="width: 300px" placeholder="请选择" filterable clearable />
+                <el-cascader v-model="listTime.deviceNum" :options="options" style="width: 400px" placeholder="请选择" filterable clearable />
               </el-form-item>
             </el-col>
-          </el-row>
-          <el-row type="flex" justify="end">
-            <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="btnQuery()">查询</el-button>
-            <el-button type="info" icon="el-icon-magic-stick" @click="resetQuery('listQuery')">重置</el-button>
-            <el-button type="success" style="background-color: #42b983;" icon="el-icon-download" @click="exportTableData">导出</el-button>
+            <el-col :span="12">
+              <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="btnQuery()">查询</el-button>
+              <el-button type="success" style="background-color: #42b983;" icon="el-icon-download" @click="exportTableData">导出</el-button>
+            </el-col>
           </el-row>
         </el-form>
       </div>
@@ -54,16 +43,12 @@
         </div>
       </div>
     </div>
-    <!-- <div class="panel-group" style="background-color:white">
-      <el-image style="width: 200px; height: 200px" :src="deviceImg" />
-    </div> -->
   </div>
 </template>
 
 <script>
 import { queryData, queryTableData, exportExcel } from '@/api/data/index'
 import echarts from 'echarts'
-import moment from 'moment'
 import { listTaskDevice } from '@/api/base/index'
 
 export default {
@@ -71,9 +56,6 @@ export default {
   data() {
     return {
       rules: {
-        startTime: [
-          { required: true, message: '请输入起点时间', trigger: 'change' }
-        ],
         deviceNum: [
           { type: 'array', required: true, message: '请输入设备编号', trigger: 'change' }
         ]
@@ -81,15 +63,12 @@ export default {
       tableHeader: {},
       chartShow: false,
       listTime: {
-        startTime: moment().format('yyyy-MM-DD 00:00:00'),
-        deviceNum: [],
-        endTime: ''
+        deviceNum: []
       },
       options: [],
       chart: null,
       tableData: [],
-      tablePage: { total: 0, pageSize: 10, pageNumber: 1 },
-      deviceImg: ''
+      tablePage: { total: 0, pageSize: 10, pageNumber: 1 }
     }
   },
   mounted() {
@@ -129,9 +108,6 @@ export default {
         this.initChart()
       }
     },
-    resetQuery(formName) {
-      this.$refs[formName].resetFields()
-    },
     initChart() {
       var contain = document.getElementById('mnsjChart')
       contain.style.width = window.innerWidth - 300 + 'px'
@@ -144,7 +120,6 @@ export default {
         this.tableData = resp.data.datas
         this.tableHeader = resp.data.tableHeader
         this.tablePage.total = resp.data.total
-        this.deviceImg = resp.data.deviceImg
       })
     },
     btnQuery() {
@@ -166,7 +141,6 @@ export default {
                 legendData.push(item.name)
               }
               this.setOptionData(resp.data.xDatas, seriesData, legendData)
-              this.deviceImg = resp.data.deviceImg
             })
           }
         } else {

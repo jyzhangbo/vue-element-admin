@@ -26,7 +26,7 @@
             </el-col>
             <el-col :span="12">
               <el-form-item label="设备编号:" prop="deviceNum">
-                <el-cascader v-model="listTime.deviceNum" :options="options" style="width: 300px" placeholder="请选择" filterable clearable />
+                <el-cascader v-model="listTime.deviceNum" :options="options" style="width: 400px" placeholder="请选择" filterable clearable />
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -41,7 +41,7 @@
             </el-col>
             <el-col :span="12">
               <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="btnQuery()">查询</el-button>
-              <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="simulationData()">模拟数据</el-button>
+              <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="simulationData()">数据编辑</el-button>
               <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="copyDataToDiglog()">复制数据</el-button>
             </el-col>
           </el-row>
@@ -151,7 +151,6 @@
 import { queryData, queryTableData, simulationData, changeData, copyData } from '@/api/data/index'
 import echarts from 'echarts'
 import { listTaskDevice } from '@/api/base/index'
-import moment from 'moment'
 
 export default {
   data() {
@@ -185,7 +184,7 @@ export default {
       tableData: [],
       chartShow: false,
       listTime: {
-        startTime: moment().format('yyyy-MM-DD 00:00:00'),
+        startTime: '',
         stableTime: '',
         downTime: '',
         endTime: '',

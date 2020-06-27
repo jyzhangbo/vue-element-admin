@@ -4,17 +4,12 @@
       <div>
         <el-form ref="listTime" :model="listTime" :rules="rulesQuery" label-width="90px">
           <el-row :gutter="10">
-            <el-col :span="7">
-              <el-form-item label="起点:" prop="startTime">
-                <el-date-picker v-model="listTime.startTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="9">
+            <el-col :span="12">
               <el-form-item label="设备编号:" prop="deviceNum">
-                <el-cascader v-model="listTime.deviceNum" :options="options" style="width: 300px" placeholder="请选择" filterable clearable />
+                <el-cascader v-model="listTime.deviceNum" :options="options" style="width: 400px" placeholder="请选择" filterable clearable />
               </el-form-item>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="12">
               <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="btnQuery()">查询</el-button>
               <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="btnModify()">修改设备信息</el-button>
             </el-col>
@@ -27,7 +22,7 @@
     </div>
     <div class="panel-group" style="background-color:white">
       <div id="chartDiv" class="chart-container">
-        <div id="mnsjChart" style="width: 100%;height:400px;" />
+        <div id="mnsjChart" style="width: 100%;height:300px;" />
       </div>
     </div>
     <div class="panel-group" style="background-color:white">
@@ -90,7 +85,6 @@
 <script>
 import { queryData } from '@/api/data/index'
 import echarts from 'echarts'
-import moment from 'moment'
 import { listImg } from '@/api/picture/index'
 import { editDeviceUser } from '@/api/device/index'
 import { listTaskDevice } from '@/api/base/index'
@@ -111,9 +105,6 @@ export default {
         ]
       },
       rulesQuery: {
-        startTime: [
-          { required: true, message: '请输入起点时间', trigger: 'change' }
-        ],
         deviceNum: [
           { type: 'array', required: true, message: '请输入设备编号', trigger: 'change' }
         ]
@@ -122,7 +113,6 @@ export default {
       cardData: [],
       time: '',
       listTime: {
-        startTime: moment().format('yyyy-MM-DD 00:00:00'),
         deviceNum: [],
         endTime: ''
       },
@@ -204,7 +194,6 @@ export default {
     },
     initChart() {
       var contain = document.getElementById('mnsjChart')
-      contain.style.height = '300px'
       this.chart = echarts.init(contain)
       this.btnQuery()
     },
@@ -251,14 +240,6 @@ export default {
         },
         legend: {
           data: legendData
-        },
-        toolbox: {
-          itemSize: 30,
-          feature: {
-            saveAsImage: {
-              show: true
-            }
-          }
         },
         grid: {
           top: 100,
