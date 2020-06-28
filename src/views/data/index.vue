@@ -131,7 +131,7 @@ export default {
             queryData(this.listTime).then(resp => {
               var seriesData = []
               var legendData = []
-              for (const item of resp.data.yDatas) {
+              for (const item of resp.data.ydatas) {
                 var data = {
                   name: item.name,
                   type: 'line',
@@ -140,7 +140,7 @@ export default {
                 seriesData.push(data)
                 legendData.push(item.name)
               }
-              this.setOptionData(resp.data.xDatas, seriesData, legendData)
+              this.setOptionData(resp.data.xdatas, seriesData, legendData)
             })
           }
         } else {

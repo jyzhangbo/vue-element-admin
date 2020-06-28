@@ -4,43 +4,38 @@
       <el-form ref="listTime" :model="listTime" :rules="rules" label-width="auto">
         <el-row :gutter="20">
           <el-col :span="6">
-            <el-form-item label="起点时间:" prop="startTime">
-              <el-date-picker v-model="listTime.startTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
+            <el-form-item label="静停温度(℃):" prop="startTemp">
+              <el-input v-model="listTime.startTemp" placeholder="静停温度" clearable />
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="恒温点时间:" prop="stableTime">
-              <el-date-picker v-model="listTime.stableTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
+            <el-form-item label="静停时长(h):" prop="startTime">
+              <el-input v-model="listTime.startTime" placeholder="静停时长" clearable />
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="降温点时间:" prop="downTime">
-              <el-date-picker v-model="listTime.downTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
+            <el-form-item label="升温速度(℃/h):" prop="upSpeed">
+              <el-input v-model="listTime.upSpeed" placeholder="升温速度" clearable />
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="终点时间:" prop="endTime">
-              <el-date-picker v-model="listTime.endTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" />
+            <el-form-item label="恒温温度(℃):" prop="constantTemp">
+              <el-input v-model="listTime.constantTemp" placeholder="恒温温度" clearable />
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="起点温度:" prop="startTemp">
-              <el-input v-model="listTime.startTemp" placeholder="起点温度" clearable />
+            <el-form-item label="恒温时长(h):" prop="constantTime">
+              <el-input v-model="listTime.constantTime" placeholder="恒温时长" clearable />
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="恒温点温度:" prop="stableTemp">
-              <el-input v-model="listTime.stableTemp" placeholder="恒温点温度" clearable />
+            <el-form-item label="降温速度(℃/h):" prop="downSpeed">
+              <el-input v-model="listTime.downSpeed" placeholder="降温速度" clearable />
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="降温点温度:" prop="downTemp">
-              <el-input v-model="listTime.downTemp" placeholder="降温点温度" clearable />
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="终点温度:" prop="endTemp">
-              <el-input v-model="listTime.endTemp" placeholder="终点温度" clearable />
+            <el-form-item label="结束温度(℃):" prop="endTemp">
+              <el-input v-model="listTime.endTemp" placeholder="结束温度" clearable />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -50,7 +45,10 @@
           </el-col>
           <el-col :span="12">
             <el-button style="background-color: #42b983;" type="success" @click="btnQuery()">查看数据图像</el-button>
-            <el-button style="background-color: #42b983;" type="success" @click="btnControl()">下发控制命令</el-button>
+            <el-button style="background-color: #42b983;" type="success" @click="btnControl()">设置温度控制阀门参数</el-button>
+            <el-button style="background-color: #42b983;" type="success" @click="btnControl()">温度模式选择</el-button>
+            <el-button style="background-color: #42b983;" type="success" @click="btnControl()">开启或关闭阀门控制</el-button>
+            <el-button style="background-color: #42b983;" type="success" @click="btnControl()">阀门控制选择探头</el-button>
           </el-col>
         </el-row>
       </el-form>
@@ -60,6 +58,24 @@
         <div id="mnsjChart" style="width:100%;height:400px;" />
       </div>
     </div>
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+      <el-form ref="dataForm" :model="temp" :rules="rules" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+        <el-form-item label="设备编号" prop="deviceNum">
+          <el-input v-model="temp.deviceNum" :disabled="dialogStatus==='create'?false:true" />
+        </el-form-item>
+        <el-form-item label="厂家名称" prop="companyName">
+          <company-name-select v-model="temp.companyName" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+          确认
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -70,45 +86,51 @@ import { controlDevice } from '@/api/control/index'
 
 export default {
   data() {
+    var validateDouble = (rule, value, callback) => {
+      var pattern = /^\d+\.?\d{0,1}$/
+      if (value === '') {
+        return callback(new Error('请输入参数'))
+      } else if (!pattern.test(value)) {
+        return callback(new Error('小数点后最多只能输入一位'))
+      } else {
+        callback()
+      }
+    }
     return {
       rules: {
+        startTemp: [
+          { required: true, trigger: 'blur', validator: validateDouble }
+        ],
         startTime: [
-          { required: true, message: '请输入起点时间', trigger: 'change' }
+          { required: true, trigger: 'blur', validator: validateDouble }
         ],
-        stableTime: [
-          { required: true, message: '请输入恒温点时间', trigger: 'change' }
+        upSpeed: [
+          { required: true, trigger: 'blur', validator: validateDouble }
         ],
-        downTime: [
-          { required: true, message: '请输入降温点时间', trigger: 'change' }
+        constantTemp: [
+          { required: true, validator: validateDouble, trigger: 'blur' }
         ],
-        endTime: [
-          { required: true, message: '请输入终点时间', trigger: 'change' }
+        constantTime: [
+          { required: true, validator: validateDouble, trigger: 'blur' }
+        ],
+        downSpeed: [
+          { required: true, validator: validateDouble, trigger: 'blur' }
+        ],
+        endTemp: [
+          { required: true, validator: validateDouble, trigger: 'blur' }
         ],
         deviceNum: [
           { type: 'array', required: true, message: '请输入设备编号', trigger: 'change' }
-        ],
-        startTemp: [
-          { required: true, message: '请输入起点温度', trigger: 'blur' }
-        ],
-        stableTemp: [
-          { required: true, message: '请输入恒温点温度', trigger: 'blur' }
-        ],
-        downTemp: [
-          { required: true, message: '请输入降温点温度', trigger: 'blur' }
-        ],
-        endTemp: [
-          { required: true, message: '请输入终点温度', trigger: 'blur' }
         ]
       },
       chart: null,
       listTime: {
-        startTime: '',
-        stableTime: '',
-        downTime: '',
-        endTime: '',
         startTemp: '',
-        stableTemp: '',
-        downTemp: '',
+        startTime: '',
+        upSpeed: '',
+        constantTemp: '',
+        constantTime: '',
+        downSpeed: '',
         endTemp: '',
         deviceNum: []
 
@@ -147,14 +169,24 @@ export default {
     btnQuery() {
       this.$refs.listTime.validate(valid => {
         if (valid) {
-          this.setOptionData()
+          var xData = [0, this.listTime.startTime]
+          var upTime = Number((this.listTime.constantTemp - this.listTime.startTemp) / this.listTime.upSpeed) + Number(this.listTime.startTime)
+          xData.push(upTime)
+          var constant = upTime + Number(this.listTime.constantTime)
+          xData.push(constant)
+          var down = Number((this.listTime.constantTemp - this.listTime.endTemp) / this.listTime.downSpeed) + Number(constant)
+          xData.push(down)
+
+          var yData = [this.listTime.startTemp, this.listTime.startTemp, this.listTime.constantTemp, this.listTime.constantTemp, this.listTime.endTemp]
+
+          this.setOptionData(xData, yData)
         } else {
           console.log('error submit!!')
           return false
         }
       })
     },
-    setOptionData() {
+    setOptionData(xData, yData) {
       this.chart.setOption({
         tooltip: {
           trigger: 'axis'
@@ -176,7 +208,7 @@ export default {
         xAxis: [{
           type: 'category',
           boundaryGap: false,
-          data: [this.listTime.startTime, this.listTime.stableTime, this.listTime.downTime, this.listTime.endTime]
+          data: xData
         }],
         yAxis: [{
           type: 'value',
@@ -192,7 +224,7 @@ export default {
           }
         }],
         series: [{
-          data: [this.listTime.startTemp, this.listTime.stableTemp, this.listTime.downTemp, this.listTime.endTemp],
+          data: yData,
           type: 'line'
         }]
       })

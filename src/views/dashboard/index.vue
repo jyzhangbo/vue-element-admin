@@ -204,7 +204,7 @@ export default {
             var seriesData = []
             var legendData = []
             this.cardData = []
-            for (const item of resp.data.yDatas) {
+            for (const item of resp.data.ydatas) {
               var data = {
                 name: item.name,
                 type: 'line',
@@ -218,14 +218,14 @@ export default {
               }
               this.cardData.push(data1)
             }
-            this.setOptionData(resp.data.xDatas, seriesData, legendData)
+            this.setOptionData(resp.data.xdatas, seriesData, legendData)
             this.temp.deviceNum = this.listTime.deviceNum[1]
             this.temp.taskNum = this.listTime.deviceNum[0]
             this.temp.deviceName = resp.data.deviceName
             this.temp.attributeInfo = resp.data.attributeInfo
             this.temp.collectSpace = resp.data.collectSpace
             this.temp.img = resp.data.deviceImg
-            this.time = resp.data.xDatas[resp.data.xDatas.length - 1]
+            this.time = resp.data.xdatas[resp.data.xdatas.length - 1]
           })
         } else {
           console.log('error submit!!')
