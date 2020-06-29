@@ -302,7 +302,8 @@ export default {
           var data = {
             name: item.name,
             type: 'line',
-            data: item.values
+            data: item.values,
+            smooth: true
           }
           seriesData.push(data)
           legendData.push(item.name)
