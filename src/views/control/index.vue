@@ -1,81 +1,122 @@
 <template>
   <div class="dashboard-editor-container">
-    <div class="panel-group" style="background-color:white">
-      <el-form ref="listTime" :model="listTime" :rules="rules" label-width="auto">
-        <el-row :gutter="20">
-          <el-col :span="6">
-            <el-form-item label="静停温度(℃):" prop="startTemp">
-              <el-input v-model="listTime.startTemp" placeholder="静停温度" clearable />
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="静停时长(h):" prop="startTime">
-              <el-input v-model="listTime.startTime" placeholder="静停时长" clearable />
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="升温速度(℃/h):" prop="upSpeed">
-              <el-input v-model="listTime.upSpeed" placeholder="升温速度" clearable />
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="恒温温度(℃):" prop="constantTemp">
-              <el-input v-model="listTime.constantTemp" placeholder="恒温温度" clearable />
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="恒温时长(h):" prop="constantTime">
-              <el-input v-model="listTime.constantTime" placeholder="恒温时长" clearable />
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="降温速度(℃/h):" prop="downSpeed">
-              <el-input v-model="listTime.downSpeed" placeholder="降温速度" clearable />
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="结束温度(℃):" prop="endTemp">
-              <el-input v-model="listTime.endTemp" placeholder="结束温度" clearable />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="设备编号:" prop="deviceNum">
-              <el-cascader v-model="listTime.deviceNum" :options="options" style="width: 300px" placeholder="请选择" filterable clearable />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-button style="background-color: #42b983;" type="success" @click="btnQuery()">查看数据图像</el-button>
-            <el-button style="background-color: #42b983;" type="success" @click="btnControl()">设置温度控制阀门参数</el-button>
-            <el-button style="background-color: #42b983;" type="success" @click="btnControl()">温度模式选择</el-button>
-            <el-button style="background-color: #42b983;" type="success" @click="btnControl()">开启或关闭阀门控制</el-button>
-            <el-button style="background-color: #42b983;" type="success" @click="btnControl()">阀门控制选择探头</el-button>
-          </el-col>
-        </el-row>
-      </el-form>
-    </div>
-    <div class="panel-group" style="background-color:white">
-      <div id="chartDiv" class="chart-container">
-        <div id="mnsjChart" style="width:100%;height:400px;" />
+    <el-form ref="listTime" :model="listTime" :rules="rules" label-width="auto">
+      <div class="panel-group" style="background-color:white">
+        <el-cascader v-model="listTime.deviceNum" :options="options" style="width: 300px" placeholder="请选择" filterable clearable />
       </div>
-    </div>
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :model="temp" :rules="rules" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="设备编号" prop="deviceNum">
-          <el-input v-model="temp.deviceNum" :disabled="dialogStatus==='create'?false:true" />
-        </el-form-item>
-        <el-form-item label="厂家名称" prop="companyName">
-          <company-name-select v-model="temp.companyName" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">
-          取消
-        </el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          确认
-        </el-button>
+      <div class="panel-group" style="background-color:white">
+        <el-steps :active="active" finish-status="success">
+          <el-step title="温度模式选择" />
+          <el-step title="阀门控制" />
+          <el-step title="选择探头" />
+          <el-step title="设置温度" />
+        </el-steps>
       </div>
-    </el-dialog>
+      <div class="panel-group" style="background-color:white">
+        <el-tabs v-model="active" tab-position="left" @tab-click="handleClick">
+          <el-tab-pane label="温度模式选择" name="0">
+            <div style="text-align:center">
+              <el-form-item>
+                <el-radio v-model="listTime.modelType" label="00">采集器模式</el-radio>
+                <el-radio v-model="listTime.modelType" label="01">阀门控制器模式</el-radio>
+              </el-form-item>
+            </div>
+          </el-tab-pane>
+          <el-tab-pane label="阀门控制" name="1">
+            <el-row :gutter="20">
+              <el-col :span="12">
+                <el-form-item label="阀门1:">
+                  <el-radio v-model="listTime.modelType" label="00">关闭</el-radio>
+                  <el-radio v-model="listTime.modelType" label="01">启动</el-radio>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row :gutter="20">
+              <el-col :span="12">
+                <el-form-item label="阀门2:">
+                  <el-radio v-model="listTime.modelType" label="00">关闭</el-radio>
+                  <el-radio v-model="listTime.modelType" label="01">启动</el-radio>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+          <el-tab-pane label="选择探头" name="2">
+            <el-row :gutter="20">
+              <el-col :span="12">
+                <el-form-item label="阀门1:">
+                  <el-radio v-model="listTime.modelType" label="00">关闭</el-radio>
+                  <el-radio v-model="listTime.modelType" label="01">启动</el-radio>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row :gutter="20">
+              <el-col :span="12">
+                <el-form-item label="阀门2:">
+                  <el-radio v-model="listTime.modelType" label="00">关闭</el-radio>
+                  <el-radio v-model="listTime.modelType" label="01">启动</el-radio>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+          <el-tab-pane label="设置温度" name="3">
+            <el-row :gutter="20">
+              <el-col :span="6">
+                <el-form-item label="静停温度(℃):" prop="startTemp">
+                  <el-input v-model="listTime.startTemp" placeholder="静停温度" clearable />
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="静停时长(h):" prop="startTime">
+                  <el-input v-model="listTime.startTime" placeholder="静停时长" clearable />
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="升温速度(℃/h):" prop="upSpeed">
+                  <el-input v-model="listTime.upSpeed" placeholder="升温速度" clearable />
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="恒温温度(℃):" prop="constantTemp">
+                  <el-input v-model="listTime.constantTemp" placeholder="恒温温度" clearable />
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="恒温时长(h):" prop="constantTime">
+                  <el-input v-model="listTime.constantTime" placeholder="恒温时长" clearable />
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="降温速度(℃/h):" prop="downSpeed">
+                  <el-input v-model="listTime.downSpeed" placeholder="降温速度" clearable />
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="结束温度(℃):" prop="endTemp">
+                  <el-input v-model="listTime.endTemp" placeholder="结束温度" clearable />
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="设备编号:" prop="deviceNum">
+                  <el-cascader v-model="listTime.deviceNum" :options="options" style="width: 300px" placeholder="请选择" filterable clearable />
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-button style="background-color: #42b983;" type="success" @click="btnQuery()">查看数据图像</el-button>
+                <el-button style="background-color: #42b983;" type="success" @click="btnControl()">设置温度控制阀门参数</el-button>
+                <el-button style="background-color: #42b983;" type="success" @click="btnControl()">温度模式选择</el-button>
+                <el-button style="background-color: #42b983;" type="success" @click="btnControl()">开启或关闭阀门控制</el-button>
+                <el-button style="background-color: #42b983;" type="success" @click="btnControl()">阀门控制选择探头</el-button>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+        </el-tabs>
+      </div>
+      <div class="panel-group" style="background-color:white">
+        <div id="chartDiv" class="chart-container">
+          <div id="mnsjChart" style="width:100%;height:400px;" />
+        </div>
+      </div>
+    </el-form>
   </div>
 </template>
 
@@ -97,6 +138,7 @@ export default {
       }
     }
     return {
+      active: 0,
       rules: {
         startTemp: [
           { required: true, trigger: 'blur', validator: validateDouble }
@@ -132,7 +174,8 @@ export default {
         constantTime: '',
         downSpeed: '',
         endTemp: '',
-        deviceNum: []
+        deviceNum: [],
+        modelType: '00'
 
       },
       options: []

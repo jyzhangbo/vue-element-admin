@@ -26,12 +26,12 @@
       </div>
     </div>
     <div class="panel-group" style="background-color:white">
-      <span style="font-size:30px;">{{ time }}</span>
+      <span style="font-size:30px;color:#00FF00">{{ time }}</span>
       <el-row :gutter="30">
         <el-col v-for="item in cardData" :key="item.name" :span="6">
           <el-card class="box-card" style="border-radius: 20px;margin-top:10px;">
             <div>
-              <span style="font-size:30px;">{{ item.name }}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span style="font-size:30px;">{{ item.name }} ：</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               <span style="font-size:30px;">{{ item.realtimevalue }}</span>
             </div>
           </el-card>
