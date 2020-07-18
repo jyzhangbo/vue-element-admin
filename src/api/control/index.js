@@ -5,8 +5,7 @@ export function controlDevice(listTime, deviceNum) {
     url: '/device/control',
     method: 'post',
     data: {
-      taskNum: deviceNum.deviceNum[0],
-      deviceNum: deviceNum.deviceNum[1],
+      deviceNum: deviceNum,
       modelType: listTime.modelType,
       tapControl1: listTime.tapControl1,
       tapControl2: listTime.tapControl2,
@@ -19,7 +18,7 @@ export function controlDevice(listTime, deviceNum) {
 
 export function getDeviceControlInfo(deviceNum) {
   return request({
-    url: '/device/control',
+    url: '/device/control/info/query',
     method: 'post',
     data: {
       deviceNum: deviceNum

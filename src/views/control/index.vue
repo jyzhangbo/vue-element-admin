@@ -1,19 +1,19 @@
 <template>
   <div class="dashboard-editor-container">
     <div class="panel-group" style="background-color:white">
-      <el-cascader v-model="deviceNum" :options="options" style="width: 300px" placeholder="请选择" filterable clearable />
+      <el-row :gutter="20">
+        <el-col :span="12">
+          设备编号：
+          <el-cascader v-model="deviceNum" :options="options" style="width: 300px" placeholder="请选择" filterable clearable @change="handleChange" />
+        </el-col>
+        <el-col :span="12">
+          <el-button style="background-color: #42b983;" type="success" @click="btnControl()">控制下发</el-button>
+        </el-col>
+      </el-row>
     </div>
     <div class="panel-group" style="background-color:white">
-      <el-steps :active="active" finish-status="success">
-        <el-step title="温度模式选择" />
-        <el-step title="阀门控制" />
-        <el-step title="选择探头" />
-        <el-step title="设置温度" />
-      </el-steps>
-    </div>
-    <el-form ref="listTime" :model="listTime" label-width="auto">
-      <div class="panel-group" style="background-color:white">
-        <el-tabs v-model="active" tab-position="left" @tab-click="handleClick">
+      <el-form ref="listTime" :model="listTime" label-width="auto">
+        <el-tabs v-model="active" @tab-click="handleClick">
           <el-tab-pane label="温度模式选择" name="0">
             <div style="text-align:center">
               <el-form-item>
@@ -26,7 +26,7 @@
           </el-tab-pane>
           <el-tab-pane label="阀门控制" name="1">
             <el-row :gutter="20">
-              <el-col :span="12">
+              <el-col :span="24">
                 <el-form-item label="阀门1:">
                   <el-radio-group v-model="listTime.tapControl1">
                     <el-radio label="00">关闭</el-radio>
@@ -41,7 +41,7 @@
               </el-col>
             </el-row>
             <el-row :gutter="20">
-              <el-col :span="12">
+              <el-col :span="24">
                 <el-form-item label="阀门2:">
                   <el-radio-group v-model="listTime.tapControl2">
                     <el-radio label="00">关闭</el-radio>
@@ -58,7 +58,7 @@
           </el-tab-pane>
           <el-tab-pane label="选择探头" name="2">
             <el-row :gutter="20">
-              <el-col :span="12">
+              <el-col :span="24">
                 <el-form-item label="阀门1:">
                   <el-checkbox-group v-model="listTime.probeType1">
                     <el-checkbox label="1">T0</el-checkbox>
@@ -74,7 +74,7 @@
               </el-col>
             </el-row>
             <el-row :gutter="20">
-              <el-col :span="12">
+              <el-col :span="24">
                 <el-form-item label="阀门2:">
                   <el-checkbox-group v-model="listTime.probeType2">
                     <el-checkbox label="1">T0</el-checkbox>
@@ -133,16 +133,13 @@
             </el-row>
             <div class="panel-group" style="background-color:white">
               <div id="chartDiv" class="chart-container">
-                <div id="mnsjChart" style="width:100%;height:400px;" />
+                <div id="mnsjChart" style="width:100%;height:200px;" />
               </div>
             </div>
           </el-tab-pane>
         </el-tabs>
-        <div>
-          <el-button style="background-color: #42b983;" type="success" @click="btnControl()">控制下发</el-button>
-        </div>
-      </div>
-    </el-form>
+      </el-form>
+    </div>
   </div>
 </template>
 
@@ -154,15 +151,15 @@ import { controlDevice, getDeviceControlInfo } from '@/api/control/index'
 export default {
   data() {
     return {
-      active: 0,
+      active: '0',
       chart: null,
       deviceNum: [],
       listTime: {
         modelType: '',
         tapControl1: '',
         tapControl2: '',
-        probeType1: [0],
-        probeType2: [0],
+        probeType1: [],
+        probeType2: [],
         tempControl: {
           startTemp: '',
           startTime: '',
@@ -174,7 +171,8 @@ export default {
         }
 
       },
-      options: []
+      options: [],
+      taskState: 1
     }
   },
   mounted() {
@@ -182,26 +180,28 @@ export default {
   },
   methods: {
     getDeviceNum() {
-      listTaskDevice().then(resp => {
+      listTaskDevice(this.taskState).then(resp => {
         this.options = resp.data
         this.deviceNum.push(resp.data[0].value)
         this.deviceNum.push(resp.data[0].children[0].value)
-        this.initChart()
+        this.controlInfo(resp.data[0].children[0].value)
       })
     },
-    getDeviceControlInfo() {
-      getDeviceControlInfo().then(resp => {
+    handleChange(value) {
+      this.controlInfo(this.deviceNum[1])
+    },
+    controlInfo(deviceNum) {
+      getDeviceControlInfo(deviceNum).then(resp => {
         this.listTime = resp.data
+        this.btnQuery()
       })
-    },
-    initChart() {
-      var contain = document.getElementById('mnsjChart')
-      this.chart = echarts.init(contain)
     },
     btnControl() {
-      controlDevice(this.listTime, this.deviceNum).then(resp => {
+      controlDevice(this.listTime, this.deviceNum[1]).then(resp => {
         alert('控制成功')
       })
+    },
+    handleClick(tab, event) {
     },
     btnQuery() {
       var temp = this.listTime.tempControl
@@ -214,7 +214,13 @@ export default {
       xData.push(down)
 
       var yData = [temp.startTemp, temp.startTemp, temp.constantTemp, temp.constantTemp, temp.endTemp]
-
+      this.initChart(xData, yData)
+    },
+    initChart(xData, yData) {
+      var contain = document.getElementById('mnsjChart')
+      contain.style.width = window.innerWidth - 300 + 'px'
+      contain.style.height = '200px'
+      this.chart = echarts.init(contain)
       this.setOptionData(xData, yData)
     },
     setOptionData(xData, yData) {
@@ -222,15 +228,8 @@ export default {
         tooltip: {
           trigger: 'axis'
         },
-        toolbox: {
-          feature: {
-            saveAsImage: {
-              show: true
-            }
-          }
-        },
         grid: {
-          top: 100,
+          top: 10,
           left: '2%',
           right: '2%',
           bottom: '2%',
