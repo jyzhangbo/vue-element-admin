@@ -12,7 +12,7 @@
       </el-row>
     </div>
     <div class="panel-group" style="background-color:white">
-      <el-form ref="listTime" :model="listTime" label-width="auto">
+      <el-form ref="listTime" :model="listTime" label-width="100px">
         <el-tabs v-model="active" @tab-click="handleClick">
           <el-tab-pane label="温度模式选择" name="0">
             <div style="text-align:center">
