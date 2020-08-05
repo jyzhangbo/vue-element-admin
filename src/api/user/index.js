@@ -14,12 +14,13 @@ export function listUser(data, tablePage) {
   })
 }
 
-export function deleteUser(data) {
+export function deleteUser(data, companyName) {
   return request({
     url: '/user/delete',
     method: 'post',
     data: {
-      loginName: data
+      loginName: data,
+      companyName: companyName
     }
   })
 }

@@ -154,7 +154,7 @@ export default {
       })
     },
     btnDel(row) {
-      deleteUser(row.loginName).then(resp => {
+      deleteUser(row.loginName, row.companyName).then(resp => {
         this.btnQuery()
       })
     },
