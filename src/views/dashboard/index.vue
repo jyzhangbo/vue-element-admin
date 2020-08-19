@@ -140,7 +140,7 @@ export default {
     } else {
       this.timer = setInterval(() => {
         this.btnQuery()
-      }, 300000)
+      }, 60000)
     }
   },
   destroyed() {
@@ -242,6 +242,16 @@ export default {
         legend: {
           data: legendData
         },
+        color: [
+          '#c12e34',
+          '#e6b600',
+          '#0098d9',
+          '#2b821d',
+          '#005eaa',
+          '#339ca8',
+          '#cda819',
+          '#32a487'
+        ],
         grid: {
           top: 100,
           left: '2%',

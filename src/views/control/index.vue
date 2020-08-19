@@ -293,6 +293,16 @@ export default {
         tooltip: {
           trigger: 'axis'
         },
+        color: [
+          '#c12e34',
+          '#e6b600',
+          '#0098d9',
+          '#2b821d',
+          '#005eaa',
+          '#339ca8',
+          '#cda819',
+          '#32a487'
+        ],
         grid: {
           top: 10,
           left: '2%',

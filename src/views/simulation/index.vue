@@ -43,6 +43,16 @@
               <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="btnQuery()">查询</el-button>
               <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="simulationData()">数据编辑</el-button>
               <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="copyDataToDiglog()">复制数据</el-button>
+              <el-upload
+                class="upload-demo inline-block margin-right-10"
+                action="https://localhost:8080/excel/upload"
+                name="upfile"
+                :data="uploadData"
+                :multiple="false"
+                :show-file-list="false"
+              >
+                <el-button style="background-color: #42b983;" type="success">点击上传</el-button>
+              </el-upload>
             </el-col>
           </el-row>
         </el-form>
@@ -201,19 +211,27 @@ export default {
         randomData: ''
       },
       options: [],
-      tablePage: { total: 0, pageSize: 10, pageNumber: 1 }
+      tablePage: { total: 0, pageSize: 10, pageNumber: 1 },
+      uploadData: {}
     }
   },
   mounted() {
     this.getDeviceNum()
   },
   methods: {
+    handleExceed(files, fileList) {
+      fileList[0].name = files[0].name
+    },
     getDeviceNum() {
       listTaskDevice().then(resp => {
         this.options = resp.data
         this.listTime.deviceNum.push(resp.data[0].value)
         this.listTime.deviceNum.push(resp.data[0].children[0].value)
         this.queryDataTable()
+        this.uploadData = {
+          taskNum: this.listTime.deviceNum[0],
+          deviceNum: this.listTime.deviceNum[1]
+        }
       })
     },
     copyData() {
@@ -319,6 +337,16 @@ export default {
         legend: {
           data: legendData
         },
+        color: [
+          '#c12e34',
+          '#e6b600',
+          '#0098d9',
+          '#2b821d',
+          '#005eaa',
+          '#339ca8',
+          '#cda819',
+          '#32a487'
+        ],
         toolbox: {
           feature: {
             saveAsImage: {
@@ -397,6 +425,10 @@ export default {
   padding-left: 20px;
   padding-right: 20px;
   padding-top: 5px;
+}
+
+.inline-block {
+  display: inline-block;
 }
 
 </style>
