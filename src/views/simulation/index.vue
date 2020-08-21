@@ -26,7 +26,7 @@
             </el-col>
             <el-col :span="12">
               <el-form-item label="设备编号:" prop="deviceNum">
-                <el-cascader v-model="listTime.deviceNum" :options="options" style="width: 400px" placeholder="请选择" filterable clearable />
+                <el-cascader v-model="listTime.deviceNum" :options="options" style="width: 400px" placeholder="请选择" filterable clearable @change="deviceNumChange" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -50,6 +50,7 @@
                 :data="uploadData"
                 :multiple="false"
                 :show-file-list="false"
+                :on-success="handleSuccess"
               >
                 <el-button style="background-color: #42b983;" type="success">点击上传</el-button>
               </el-upload>
@@ -219,19 +220,25 @@ export default {
     this.getDeviceNum()
   },
   methods: {
-    handleExceed(files, fileList) {
-      fileList[0].name = files[0].name
+    handleSuccess(response, file, fileList) {
+      this.btnQuery()
+    },
+    deviceNumChange() {
+      this.uploadData = {
+        taskNum: this.listTime.deviceNum[0],
+        deviceNum: this.listTime.deviceNum[1]
+      }
     },
     getDeviceNum() {
       listTaskDevice().then(resp => {
         this.options = resp.data
         this.listTime.deviceNum.push(resp.data[0].value)
         this.listTime.deviceNum.push(resp.data[0].children[0].value)
-        this.queryDataTable()
         this.uploadData = {
           taskNum: this.listTime.deviceNum[0],
           deviceNum: this.listTime.deviceNum[1]
         }
+        this.queryDataTable()
       })
     },
     copyData() {
