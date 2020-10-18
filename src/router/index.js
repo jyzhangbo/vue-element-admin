@@ -179,9 +179,9 @@ export const asyncRoutes = [
       {
         path: 'index',
         component: () => import('@/views/simulation/index'),
-        name: '数据模拟',
+        name: '编辑数据',
         meta: {
-          title: '数据模拟',
+          title: '编辑数据',
           icon: 'simulation',
           noCache: true,
           roles: ['userAdmin']

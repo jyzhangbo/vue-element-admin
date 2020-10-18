@@ -41,11 +41,11 @@
             </el-col>
             <el-col :span="12">
               <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="btnQuery()">查询</el-button>
-              <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="simulationData()">数据编辑</el-button>
+              <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="simulationData()">模拟数据</el-button>
               <el-button style="background-color: #42b983;" type="success" icon="el-icon-search" @click="copyDataToDiglog()">复制数据</el-button>
               <el-upload
                 class="upload-demo inline-block margin-right-10"
-                action="https://localhost:8080/excel/upload"
+                action="/excel/upload"
                 name="upfile"
                 :data="uploadData"
                 :multiple="false"
@@ -68,7 +68,7 @@
         </el-col>
       </el-row>
       <div v-show="chartShow" id="chartDiv" class="chart-container">
-        <div id="mnsjChart" style="width:100%;height:400px;" />
+        <div id="mnsjChart" style="width:100%;height:500px;" />
       </div>
       <div v-show="!chartShow">
         <el-table :data="tableData" border stripe style="width: 100%">
@@ -300,7 +300,7 @@ export default {
     initChart() {
       var contain = document.getElementById('mnsjChart')
       contain.style.width = window.innerWidth - 300 + 'px'
-      contain.style.height = '300px'
+      contain.style.height = '500px'
       this.chart = echarts.init(contain)
       this.queryDataChart()
     },
