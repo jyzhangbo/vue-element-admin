@@ -43,7 +43,7 @@
           <el-button type="primary" size="mini" @click="btnEdit(row)">
             修改
           </el-button>
-          <el-button type="primary" size="mini" @click="btnDel(row)">
+          <el-button type="primary" size="mini" :disabled="row.loginName === 'admin'?true:false" @click="btnDel(row)">
             删除
           </el-button>
         </template>

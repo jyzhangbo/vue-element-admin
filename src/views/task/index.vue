@@ -140,7 +140,7 @@ export default {
         value: '2',
         label: '结束'
       }, {
-        value: undefined,
+        value: '3',
         label: '全选'
       }],
       dialogFormVisible: false,

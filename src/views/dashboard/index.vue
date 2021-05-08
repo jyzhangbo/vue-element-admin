@@ -125,7 +125,7 @@ export default {
         deviceNum: undefined,
         deviceName: undefined,
         attributeInfo: undefined,
-        img: 'https://hlbr.smartdeviceclub.com/home/img/d7dcd2deb11840af8b40cd93f800b116.png',
+        img: 'https://hlbr.smartdeviceclub.cn/home/img/d7dcd2deb11840af8b40cd93f800b116.png',
         collectSpace: undefined,
         taskNum: undefined
 
