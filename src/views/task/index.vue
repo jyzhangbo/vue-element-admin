@@ -77,8 +77,8 @@
         </el-form-item>
         <el-form-item label="设备列表" prop="deviceNums">
           <el-checkbox-group v-model="temp.deviceNums">
-            <el-row :gutter="20">
-              <el-col v-for="item in deviceList" :key="item.deviceNum" :span="12">
+            <el-row>
+              <el-col v-for="item in deviceList" :key="item.deviceNum">
                 <el-checkbox :label="item.deviceNum">
                   {{ item.deviceName }}
                 </el-checkbox>
