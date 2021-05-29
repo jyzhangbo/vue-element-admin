@@ -31,6 +31,7 @@
 
     <el-table :data="tableData" border stripe style="width: 100%">
       <el-table-column type="index" label="序号" width="50" />
+      <el-table-column v-if="show" prop="companyName" label="companyName" width="50" />
       <el-table-column prop="taskNum" label="梁号" width="80" />
       <el-table-column prop="taskName" label="台座号" width="80" />
       <el-table-column prop="taskStatus" label="状态" width="80">
@@ -71,6 +72,9 @@
       <el-form ref="dataForm" :model="temp" :rules="rules" label-position="left" label-width="100px" style="width: 50%; margin-left:50px;">
         <el-form-item label="梁号" prop="taskNum">
           <el-input v-model="temp.taskNum" :disabled="dialogStatus==='create'?false:true" />
+        </el-form-item>
+        <el-form-item v-if="show" label="公司" prop="companyName">
+          <el-input v-model="temp.companyName" :disabled="dialogStatus==='create'?false:true" />
         </el-form-item>
         <el-form-item label="台座号" prop="taskName">
           <el-input v-model="temp.taskName" />
@@ -152,6 +156,7 @@ export default {
       temp: {
         taskName: undefined,
         taskNum: undefined,
+        companyName: undefined,
         deviceNums: []
       },
       listQuery: {
@@ -161,7 +166,8 @@ export default {
       },
       tablePage: { total: 0, pageSize: 10, pageNumber: 1 },
       tableData: [],
-      deviceList: []
+      deviceList: [],
+      show: false
     }
   },
   mounted() {
@@ -233,6 +239,8 @@ export default {
     btnEdit(row) {
       this.temp.taskName = row.taskName
       this.temp.taskNum = row.taskNum
+      this.temp.companyName = row.companyName
+      this.temp.deviceNums = []
       for (var i = 0; i < row.devices.length; i++) {
         this.temp.deviceNums.push(row.devices[i].deviceNum)
       }

@@ -32,7 +32,8 @@ export function editTask(data) {
       taskNum: data.taskNum,
       devices: data.deviceNums,
       state: data.state,
-      taskName: data.taskName
+      taskName: data.taskName,
+      companyName: data.companyName
     }
   })
 }
@@ -54,7 +55,8 @@ export function deleteTask(data) {
     url: '/task/delete',
     method: 'post',
     data: {
-      taskNum: data.taskNum
+      taskNum: data.taskNum,
+      companyName: data.companyName
     }
   })
 }
