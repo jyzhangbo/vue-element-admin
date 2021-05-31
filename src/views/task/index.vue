@@ -167,7 +167,7 @@ export default {
       tablePage: { total: 0, pageSize: 10, pageNumber: 1 },
       tableData: [],
       deviceList: [],
-      show: false
+      show: true
     }
   },
   mounted() {
@@ -188,6 +188,7 @@ export default {
 
       var data = {
         state: status,
+        companyName: row.companyName,
         taskNum: row.taskNum,
         deviceNums: deviceNums
       }
@@ -258,6 +259,7 @@ export default {
       this.temp = {
         taskName: undefined,
         taskNum: undefined,
+        companyName: undefined,
         deviceNums: []
       }
     }
